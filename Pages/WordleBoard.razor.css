@@ -1,1 +1,41 @@
-﻿
+﻿#wordle-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2em;
+   
+}
+
+.row {
+    /* gap: 5px; */
+    gap: 5px;
+    margin: 5px 5px;
+    /* margin-bottom: 5px; */
+    display: flex;
+    justify-content: space-evenly;
+    /* margin-bottom: 1em; */
+}
+
+.cell {
+    font-weight: bold;
+    font-size: 3rem;
+    width: 4rem;
+    height: 4rem;
+    border: 1px solid black;
+    text-align: center;
+    line-height: 1.25em;
+    color: #fff;
+    vertical-align: middle;
+}
+
+.color-wrong {
+    background-color: var(--color-wrong);
+}
+
+.color-correct {
+    background-color: var(--color-correct);
+}
+
+.color-close {
+    background-color: var(--color-close);
+}

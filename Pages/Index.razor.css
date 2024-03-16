@@ -1,0 +1,23 @@
+﻿root {
+    --color-background: #121312;
+    --color-wrong: #3a3a3c;
+    --color-correct: #538d4e;
+    --color-close: #b59f3b;
+}
+
+
+
+#header-text {
+    /*    
+    margin-top: 2em;*/
+    /*flex-direction: column;*/
+    display: flex;
+    /*align-items: center;*/
+    justify-content: center;
+}
+
+.header-row {
+    /*display: flex;*/
+    /*justify-content: space-evenly;*/
+}
+

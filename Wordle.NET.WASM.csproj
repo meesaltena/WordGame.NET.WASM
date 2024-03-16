@@ -1,16 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+	<Deterministic>false</Deterministic>
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Pages\Index.razor.css" />
     <None Remove="Pages\WordleBoard.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Pages\Index.razor.css" />
     <Content Include="Pages\WordleBoard.razor.css" />
   </ItemGroup>
 
