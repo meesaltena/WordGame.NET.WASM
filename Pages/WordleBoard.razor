@@ -1,0 +1,184 @@
+﻿@using System.Text.RegularExpressions;
+
+<div id="wordle-board" class="">
+
+    @for (int i = 0; i < maxGuessCount; i++)
+    {
+        <div class="row">
+            @for (int j = 0; j < word.Length; j++)
+            {
+                <div class="@GetCellColor(i,j)">@GetChar(i, j)</div>
+            }
+        </div>
+    }
+</div>
+<style>
+    #wordle-board {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 2em;
+        background-color: var(--color-background);
+    }
+
+    .row {
+        /* gap: 5px; */
+        gap: 5px;
+        margin: 5px 5px;
+        /* margin-bottom: 5px; */
+        display: flex;
+        justify-content: space-evenly;
+        /* margin-bottom: 1em; */
+    }
+
+    .cell {
+        font-family: 'Consolas';
+        font-weight: bold;
+        font-size: 3rem;
+        width: 4rem;
+        height: 4rem;
+        border: 1px solid black;
+        text-align: center;
+        line-height: 1.25em;
+        color: #fff;
+        vertical-align: middle;
+    }
+
+    .color-wrong {
+        background-color: var(--color-wrong);
+    }
+
+    .color-correct {
+        background-color: var(--color-correct);
+    }
+
+    .color-close {
+        background-color: var(--color-close);
+    }
+
+    :root {
+        --color-background: #121312;
+        --color-wrong: #3a3a3c;
+        --color-correct: #538d4e;
+        --color-close: #b59f3b;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public int maxGuessCount { get; set; } = 6;
+
+    string word = "APMLY";
+
+    // List<string> guesses = new()
+    // {
+    //     "PEEPO",
+    //     "STALK",
+    //     "TALAS",
+    //     "CRASH",
+    //     "WATER",
+    //     "TRASH",
+    // };
+
+    List<string> guesses = new()
+    {
+        "POINT",
+        "APPLY",
+        "PUPPY",
+        "AMPLY",
+        "APMLY",
+        "-----",
+    };
+
+    string GetCellColor(int i, int j)
+    {
+
+        int charAppearsTimes = guesses[i].Count(c => c == guesses[i][j]);
+
+        if (charAppearsTimes > 1)
+        {
+            var places = AllIndexOf(word, guesses[i][j].ToString());
+            if (word.Contains(guesses[i][j]) && !places.Contains(j))
+            {
+                return "cell color-wrong";
+            }
+
+            if (word.Contains(guesses[i][j]))
+            {
+                if (guesses[i][j] != word[j])
+                {
+                    var placess = AllIndexOf(word, guesses[i][j].ToString());
+
+                    foreach(int place in placess)
+                    {
+                        if(word[place] == guesses[i][place])
+                        {
+                            return "cell color-wrong";
+
+                        }
+                    }
+                    return "cell color-close";
+
+                }
+                
+            }
+
+            if (guesses[i][j] == word[j] && !guesses[i].Substring(i,j).Contains(guesses[i][j]))
+            {
+                return "cell color-correct";
+            }
+            else
+            {
+                return "cell color-wrong";
+            }
+            
+        }
+        else
+        {
+            if (guesses[i][j] == word[j])
+            {
+                return "cell color-correct";
+            }
+            else if (word.Contains(guesses[i][j]))
+            {
+                return "cell color-close";
+            }
+            return "cell color-wrong";
+        }
+
+        // if (guesses[i][j] == word[j])
+        // {
+        //     return "cell color-correct";
+        // }
+        // else if (word.Contains(guesses[i][j]))
+        // {
+        //     return "cell color-close";
+        // }
+
+        // return "cell color-wrong";
+    }
+
+
+    public IList<int> AllIndexOf(string text, string str, StringComparison comparisonType = StringComparison.InvariantCultureIgnoreCase)
+    {
+        IList<int> allIndexOf = new List<int>();
+        int index = text.IndexOf(str, comparisonType);
+        while (index != -1)
+        {
+            allIndexOf.Add(index);
+            index = text.IndexOf(str, index + 1, comparisonType);
+        }
+        return allIndexOf;
+    }
+
+
+    char GetChar(int i, int j)
+    {
+        return guesses[i][j];
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
+}
