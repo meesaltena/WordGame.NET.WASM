@@ -10,7 +10,8 @@
                 <div class="row">
                     @for (int letterNo = 0; letterNo < word.Length; letterNo++)
                     {
-                        <div class="@GetCellColor(guessNo,letterNo)">@GetCharacter(guessNo, letterNo)</div>
+                        @* <div class="@GetCellColor(guessNo,letterNo)">@GetCharacter(guessNo, letterNo)</div> *@
+                        <div class="@cellColors[guessNo][letterNo]">@GetCharacter(guessNo, letterNo)</div>
                     }
                 </div>
             }
@@ -39,8 +40,9 @@
     [Parameter]
     public int maxGuessCount { get; set; } = 6;
     public string inputWord { get; set; } = string.Empty;
-    private string word = "AMPLE";
+    private string word = "APPLE";
     private string emptyGuess = "     ";
+    private int guessesMade = 0;
     bool boardReady = false;
     List<string> guesses = new();    
     Dictionary<int, List<char>> alreadyHintedLettersForGuess = new();
@@ -50,16 +52,22 @@
     {
         var savedColor = cellColors[guessNo][letterNo];
         // if cell color is empty (true on startup) or guess with current guessNo is not empty, compute the needed cell color
-        if (string.IsNullOrWhiteSpace(savedColor) || !string.IsNullOrWhiteSpace(guesses[guessNo]))
+        // if (string.IsNullOrWhiteSpace(savedColor) || !string.IsNullOrWhiteSpace(guesses[guessNo]))
+        if (guessesMade == guessNo+1 || string.IsNullOrWhiteSpace(guesses[guessNo]))
         {
             cellColors[guessNo][letterNo] = ComputeCellColor(guessNo, letterNo);
         }
+
+        // if (string.IsNullOrWhiteSpace(savedColor) || guessesMade == guessNo || !string.IsNullOrWhiteSpace(guesses[guessNo]))
+        // {
+        //     cellColors[guessNo][letterNo] = ComputeCellColor(guessNo, letterNo);
+        // }
         return cellColors[guessNo][letterNo];
     }
 
     string ComputeCellColor(int guessNo, int letterNo)
     {
- 
+
         string guess = guesses[guessNo];
 
 
@@ -173,6 +181,7 @@
         {
             guesses[ind] = inputWord;
             inputWord = string.Empty;
+            guessesMade++;
         }
     }
 
