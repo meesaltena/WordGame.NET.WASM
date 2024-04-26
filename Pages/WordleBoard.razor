@@ -11,11 +11,8 @@
                 {
                     <div class="@GetCellColor(i,j)">@GetChar(i, j)</div>
                 }
-
             </div>
-
         }
-
     </div>
 
     <div id="wordle-input">
@@ -40,17 +37,10 @@
     [Parameter]
     public int maxGuessCount { get; set; } = 6;
     public string inputWord { get; set; } = string.Empty;
-    string word = "APMLY";
+    private string word = "APMLY";
+    private string emptyGuess = "     ";
 
-    List<string> guesses = new()
-    {
-        "POINT",
-        "APPLY",
-        "PUPPY",
-        "AMPLY",
-        "APMLY",
-        "-----",
-    };
+    List<string> guesses = new();
 
     string GetCellColor(int i, int j)
     {
@@ -63,6 +53,20 @@
 
         switch (e.Key)
         {
+            case "Enter":
+                if(inputWord.Length == word.Length)
+                {
+                    int ind = guesses.IndexOf(emptyGuess);
+                    if(ind > -1)
+                    {
+                        guesses[ind] = inputWord;
+                        inputWord = string.Empty;
+                    }
+                } else
+                {
+                    // show shake animation
+                }
+                break;
             case "Backspace":
                 if (inputWord.Length > 0)
                 {
@@ -99,6 +103,7 @@
 
     protected override Task OnInitializedAsync()
     {
+        guesses = Enumerable.Range(0, maxGuessCount).Select(_ => emptyGuess).ToList();
         inputWord = "ADIEU";
         return base.OnInitializedAsync();
     }
