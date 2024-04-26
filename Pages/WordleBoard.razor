@@ -37,11 +37,12 @@
     [Parameter]
     public int maxGuessCount { get; set; } = 6;
     public string inputWord { get; set; } = string.Empty;
-    private string word = "PAPER";
+    private string word = "AMPLE";
     private string emptyGuess = "     ";
 
     List<string> guesses = new();    
     Dictionary<int, List<char>> alreadyHintedLettersForGuess = new();
+    Dictionary<int, Dictionary<int, string>> cellColors = new();
 
     string GetCellColor(int guessNo, int letterNo)
     {
@@ -58,7 +59,7 @@
         // var charCountInGuess = AllIndexOf(guess, guessLetter.ToString());
 
         // if letter doesn't appear, return wrong.
-        if (!guessLetterAppears)
+        if (!guessLetterAppears || string.IsNullOrWhiteSpace(guess))
         {
             return "cell color-wrong";
         }
@@ -67,6 +68,7 @@
             // if current guess letter appears in the word at the current position return correct.
             if(word[letterNo] == guessLetter)
             {
+                Console.WriteLine($"guessLetter {guessLetter} appears in the correct position.");
                 return "cell color-correct";
             }
 
@@ -94,11 +96,6 @@
                     Console.WriteLine($"and it's here?");
                 }
             }
-            // else
-            // {
-            //     Console.Write($"guessLetter {guessLetter} appears more than once ({guessLetterAppearancesInGuess.Count()}) in guess");
-
-            // }
 
 
 
@@ -109,15 +106,22 @@
             {
                 // at least one appearance of the current letter, appears in the same spot in the word. 
                 Console.WriteLine($"at least one appearance of the  guessLetter {guessLetter}, appears in the same spot in the word.");
-                if (matches.Count() == 1) // the current guess letter appears in the word once. If we are not there currently, return wrong.
+                if (matches.Count() == 1) // the current guess letter appears in the word current position at least once. If we are not there currently, return wrong.
                 {
+                    Console.WriteLine($"Matches count == 1");
+
                     if (matches.First() != letterNo)
                     {
+                        if (guessLetterAppearancesInWord.Count() > 1)
+                        {
+                            return "cell color-close";
+                        }
                         return "cell color-wrong";
                     }
                     else
                     {
                         // the guessletter appears in the current location in the word. Correct.
+                        Console.WriteLine($"the guessletter appears in the current location in the word. Correct.");
                         return "cell color-correct";
                     }
                     Console.WriteLine($"-----------");
@@ -169,8 +173,6 @@
 
     protected void KeyDown(KeyboardEventArgs e)
     {
-        Console.WriteLine("KeyDown");
-
         switch (e.Key)
         {
             case "Enter":
@@ -193,7 +195,6 @@
                 if (e.Key.Length == 1 && inputWord.Length < word.Length)
                 {
                     inputWord += e.Key.ToUpper();
-                    Console.WriteLine(inputWord);
                 }
                 break;
         }
@@ -219,10 +220,17 @@
 
     protected override Task OnInitializedAsync()
     {
+
+        for(int n = 0; n <= maxGuessCount; n++)
+        {
+            var d = new Dictionary<int, string> { { 0, "" }, { 1, "" }, { 2, "" }, { 3, "" }, { 4, "" }, { 5, "" }, { 6, "" } };
+            cellColors.Add(n, d);
+        }
         guesses = Enumerable.Range(0, maxGuessCount).Select(_ => emptyGuess).ToList();
         Enumerable.Range(0, maxGuessCount).ToList().ForEach(i =>
         {
             alreadyHintedLettersForGuess.Add(i, new List<char>());
+            // cellColors.Add(i, new());
         });
         // inputWord = "ADIEU";
         return base.OnInitializedAsync();
