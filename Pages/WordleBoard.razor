@@ -1,7 +1,7 @@
 ﻿@using System.Text.RegularExpressions;
 @using Microsoft.AspNetCore.Components.Forms
 
-<div id="wordle-container" @onkeydown="KeyDown">
+<div id="wordle-container" @onkeydown="KeyDown" tabindex="0">
     <div id="wordle-board">
 
         @for (int i = 0; i < maxGuessCount; i++)
@@ -18,9 +18,7 @@
 
     </div>
 
-    @* @onclick="() => FocusTextInput()" *@
-    @* <div id="wordle-input" @onkeydown="@KeyDown"  @ref="@inputDiv"> *@
-    <div id="wordle-input" @onkeydown="@KeyDown" @ref="@inputDiv">
+    <div id="wordle-input">
 
         <div class="row">
             @for (int j = 0; j < inputWord.Length; j++)
@@ -36,9 +34,6 @@
             }
         </div>
     </div>
-    <div>INPUT</div>
-    <InputText type="hidden" @bind-Value="@inputWord" />
-
 
 </div>
 @code {
@@ -46,20 +41,6 @@
     public int maxGuessCount { get; set; } = 6;
     public string inputWord { get; set; } = string.Empty;
     string word = "APMLY";
-
-    private ElementReference inputDiv;
-    private InputText inputTextForFocus;
-
-    ElementReference wordInput;
-    // List<string> guesses = new()
-    // {
-    //     "PEEPO",
-    //     "STALK",
-    //     "TALAS",
-    //     "CRASH",
-    //     "WATER",
-    //     "TRASH",
-    // };
 
     List<string> guesses = new()
     {
@@ -76,38 +57,26 @@
         return "cell color-wrong";
     }
 
-
     protected void KeyDown(KeyboardEventArgs e)
     {
         Console.WriteLine("KeyDown");
-        if (e.Key == "Backspace" && inputWord.Length > 0)
+
+        switch (e.Key)
         {
-            Console.WriteLine("Backspace");
-            inputWord = inputWord.Remove(inputWord.Length - 1);
+            case "Backspace":
+                if (inputWord.Length > 0)
+                {
+                    inputWord = inputWord.Remove(inputWord.Length - 1);
+                }
+                break;
+            default:
+                if (e.Key.Length == 1 && inputWord.Length < word.Length)
+                {
+                    inputWord += e.Key.ToUpper();
+                    Console.WriteLine(inputWord);
+                }
+                break;
         }
-        else if (Char.IsLetter(e.Key[0]) && inputWord.Length <= word.Length)
-        {
-
-            inputWord += e.Key.ToUpper();
-            Console.WriteLine(inputWord);
-        }
-
-
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await inputDiv.FocusAsync();
-        // if (inputDiv != null)
-        // {
-        //     await inputTextForFocus.Element.Value.FocusAsync();
-        //     inputWord = "APPLE";
-        // }
-        // if (inputTextForFocus?.Element != null)
-        // {
-        //     await inputTextForFocus.Element.Value.FocusAsync();
-        //     inputWord = "APPLE";
-        // }
     }
 
     public IList<int> AllIndexOf(string text, string str, StringComparison comparisonType = StringComparison.InvariantCultureIgnoreCase)
