@@ -9,14 +9,17 @@
 
 #header-text {
     /*    
+
     margin-top: 2em;*/
     /*flex-direction: column;*/
     display: flex;
     /*align-items: center;*/
     justify-content: center;
+    text-align: center;
 }
 
 .header-row {
+    color: var(--color-grey);
     /*display: flex;*/
     /*justify-content: space-evenly;*/
 }

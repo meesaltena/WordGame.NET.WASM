@@ -9,7 +9,6 @@
     </div>
 </div>
 
-
 <WordleBoard />
 
 </div>
@@ -19,7 +18,6 @@
     protected override Task OnInitializedAsync()
     {
         BuildNumber = typeof(Program).Assembly.GetName().Version!.ToString();
-        // BuildNumber = Assembly.GetExecutingAssembly().ManifestModule.ModuleVersionId;
         return base.OnInitializedAsync();
     }
 }

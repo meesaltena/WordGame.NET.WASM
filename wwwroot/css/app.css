@@ -1,14 +1,17 @@
 :root {
     --color-background: #121312;
+    /*--color-container: #DFE3A2;*/
+    --color-container: #121213;
     --color-wrong: #3a3a3c;
     --color-correct: #538d4e;
     --color-close: #b59f3b;
+    --color-grey: #818384;
+    --color-white: #fff;
     font-family: 'Consolas';
-
 }
 
-#app-container {
-    background-color: var(--color-correct);
+html {
+    background-color: var(--color-container);
 }
 
 h1:focus {

@@ -1,24 +1,56 @@
 ﻿@using System.Text.RegularExpressions;
+@using Microsoft.AspNetCore.Components.Forms
 
-<div id="wordle-board" class="">
+<div id="wordle-container" @onkeydown="KeyDown">
+    <div id="wordle-board">
 
-    @for (int i = 0; i < maxGuessCount; i++)
-    {
+        @for (int i = 0; i < maxGuessCount; i++)
+        {
+            <div class="row">
+                @for (int j = 0; j < word.Length; j++)
+                {
+                    <div class="@GetCellColor(i,j)">@GetChar(i, j)</div>
+                }
+
+            </div>
+
+        }
+
+    </div>
+
+    @* @onclick="() => FocusTextInput()" *@
+    @* <div id="wordle-input" @onkeydown="@KeyDown"  @ref="@inputDiv"> *@
+    <div id="wordle-input" @onkeydown="@KeyDown" @ref="@inputDiv">
+
         <div class="row">
-            @for (int j = 0; j < word.Length; j++)
+            @for (int j = 0; j < inputWord.Length; j++)
             {
-                <div class="@GetCellColor(i,j)">@GetChar(i, j)</div>
+                <div class="cell color-wrong">@inputWord[j]</div>
+            }
+            @if (inputWord.Length < word.Length)
+            {
+                @for (int j = 0; j < (word.Length - inputWord.Length); j++)
+                {
+                    <div class="cell color-wrong"></div>
+                }
             }
         </div>
-    }
-</div>
+    </div>
+    <div>INPUT</div>
+    <InputText type="hidden" @bind-Value="@inputWord" />
 
+
+</div>
 @code {
     [Parameter]
     public int maxGuessCount { get; set; } = 6;
-
+    public string inputWord { get; set; } = string.Empty;
     string word = "APMLY";
 
+    private ElementReference inputDiv;
+    private InputText inputTextForFocus;
+
+    ElementReference wordInput;
     // List<string> guesses = new()
     // {
     //     "PEEPO",
@@ -45,6 +77,39 @@
     }
 
 
+    protected void KeyDown(KeyboardEventArgs e)
+    {
+        Console.WriteLine("KeyDown");
+        if (e.Key == "Backspace" && inputWord.Length > 0)
+        {
+            Console.WriteLine("Backspace");
+            inputWord = inputWord.Remove(inputWord.Length - 1);
+        }
+        else if (Char.IsLetter(e.Key[0]) && inputWord.Length <= word.Length)
+        {
+
+            inputWord += e.Key.ToUpper();
+            Console.WriteLine(inputWord);
+        }
+
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await inputDiv.FocusAsync();
+        // if (inputDiv != null)
+        // {
+        //     await inputTextForFocus.Element.Value.FocusAsync();
+        //     inputWord = "APPLE";
+        // }
+        // if (inputTextForFocus?.Element != null)
+        // {
+        //     await inputTextForFocus.Element.Value.FocusAsync();
+        //     inputWord = "APPLE";
+        // }
+    }
+
     public IList<int> AllIndexOf(string text, string str, StringComparison comparisonType = StringComparison.InvariantCultureIgnoreCase)
     {
         IList<int> allIndexOf = new List<int>();
@@ -65,6 +130,7 @@
 
     protected override Task OnInitializedAsync()
     {
+        inputWord = "ADIEU";
         return base.OnInitializedAsync();
     }
 }

@@ -6,12 +6,21 @@
    
 }
 
+#wordle-input { 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2em;
+}
+
 .row {
     /* gap: 5px; */
-    gap: 5px;
-    margin: 5px 5px;
-    /* margin-bottom: 5px; */
+
+   /*margin: 5px 5px; */ 
+    margin-bottom: 5px; 
     display: flex;
+    column-gap: 5px;
+    row-gap: 15px;
     justify-content: space-evenly;
     /* margin-bottom: 1em; */
 }
@@ -24,7 +33,7 @@
     border: 1px solid black;
     text-align: center;
     line-height: 1.25em;
-    color: #fff;
+    color: var(--color-white);
     vertical-align: middle;
 }
 
