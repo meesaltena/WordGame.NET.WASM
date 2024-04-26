@@ -3,15 +3,17 @@
 
 <div id="wordle-container" @onkeydown="KeyDown" tabindex="0">
     <div id="wordle-board">
-
-        @for (int guessNo = 0; guessNo < maxGuessCount; guessNo++)
+        @if (boardReady)
         {
-            <div class="row">
-                @for (int letterNo = 0; letterNo < word.Length; letterNo++)
-                {
-                    <div class="@GetCellColor(guessNo,letterNo)">@GetCharacter(guessNo, letterNo)</div>
-                }
-            </div>
+            @for (int guessNo = 0; guessNo < maxGuessCount; guessNo++)
+            {
+                <div class="row">
+                    @for (int letterNo = 0; letterNo < word.Length; letterNo++)
+                    {
+                        <div class="@GetCellColor(guessNo,letterNo)">@GetCharacter(guessNo, letterNo)</div>
+                    }
+                </div>
+            }
         }
     </div>
 
@@ -31,21 +33,33 @@
             }
         </div>
     </div>
-
 </div>
+
 @code {
     [Parameter]
     public int maxGuessCount { get; set; } = 6;
     public string inputWord { get; set; } = string.Empty;
     private string word = "AMPLE";
     private string emptyGuess = "     ";
-
+    bool boardReady = false;
     List<string> guesses = new();    
     Dictionary<int, List<char>> alreadyHintedLettersForGuess = new();
-    Dictionary<int, Dictionary<int, string>> cellColors = new();
+    List<List<string>> cellColors = new();
 
     string GetCellColor(int guessNo, int letterNo)
     {
+        var savedColor = cellColors[guessNo][letterNo];
+        // if cell color is empty (true on startup) or guess with current guessNo is not empty, compute the needed cell color
+        if (string.IsNullOrWhiteSpace(savedColor) || !string.IsNullOrWhiteSpace(guesses[guessNo]))
+        {
+            cellColors[guessNo][letterNo] = ComputeCellColor(guessNo, letterNo);
+        }
+        return cellColors[guessNo][letterNo];
+    }
+
+    string ComputeCellColor(int guessNo, int letterNo)
+    {
+ 
         string guess = guesses[guessNo];
 
 
@@ -56,7 +70,6 @@
 
         var currentLetterMatchIndexes = AllIndexOf(word, guessLetter.ToString());
 
-        // var charCountInGuess = AllIndexOf(guess, guessLetter.ToString());
 
         // if letter doesn't appear, return wrong.
         if (!guessLetterAppears || string.IsNullOrWhiteSpace(guess))
@@ -140,9 +153,6 @@
         var gla = AllIndexOf(word, guessLetter.ToString());
         if (gla.Any())
         {
-            Console.WriteLine($"AAAAAAAAAAAAAAAAThe guessLetter {guessLetter} appears {gla.Count()} times in the word.");
-
-
             if (!alreadyHintedLettersForGuess[guessNo].Contains(guessLetter))
             {
                 alreadyHintedLettersForGuess[guessNo].Add(guessLetter);
@@ -151,14 +161,9 @@
         }
         else
         {
-            Console.WriteLine($"AAAAAAAAAAAAAAAAThe guessLetter {guessLetter} appears 0 times in the word.");
         }
 
-
         return "cell color-none";
-
-
-
     }
 
     private void putGuess(string g)
@@ -220,19 +225,25 @@
 
     protected override Task OnInitializedAsync()
     {
-
-        for(int n = 0; n <= maxGuessCount; n++)
+        for (int n = 0; n < maxGuessCount; n++)
         {
-            var d = new Dictionary<int, string> { { 0, "" }, { 1, "" }, { 2, "" }, { 3, "" }, { 4, "" }, { 5, "" }, { 6, "" } };
-            cellColors.Add(n, d);
+            cellColors.Add(new List<string>());
         }
+
+        for (int m = 0; m < cellColors.Count; m++)
+        {
+             for (int k = 0; k < maxGuessCount; k++)
+            {
+                cellColors[m].Add("");
+            }
+        }
+
         guesses = Enumerable.Range(0, maxGuessCount).Select(_ => emptyGuess).ToList();
         Enumerable.Range(0, maxGuessCount).ToList().ForEach(i =>
         {
             alreadyHintedLettersForGuess.Add(i, new List<char>());
-            // cellColors.Add(i, new());
         });
-        // inputWord = "ADIEU";
+        boardReady = true;
         return base.OnInitializedAsync();
     }
 }
