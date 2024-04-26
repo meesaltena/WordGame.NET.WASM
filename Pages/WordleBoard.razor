@@ -11,7 +11,8 @@
                     @for (int letterNo = 0; letterNo < word.Length; letterNo++)
                     {
                         @* <div class="@GetCellColor(guessNo,letterNo)">@GetCharacter(guessNo, letterNo)</div> *@
-                        <div class="@cellColors[guessNo][letterNo]">@GetCharacter(guessNo, letterNo)</div>
+                        @* <div class="@cellColors[guessNo][letterNo]">@GetCharacter(guessNo, letterNo)</div> *@
+                        <div class="@cellColors[guessNo,letterNo]">@GetCharacter(guessNo, letterNo)</div>
                     }
                 </div>
             }
@@ -44,134 +45,172 @@
     private string emptyGuess = "     ";
     private int guessesMade = 0;
     bool boardReady = false;
-    List<string> guesses = new();    
+    List<string> guesses = new();
     Dictionary<int, List<char>> alreadyHintedLettersForGuess = new();
-    List<List<string>> cellColors = new();
+    // List<List<string>> cellColors = new();
 
-    string GetCellColor(int guessNo, int letterNo)
+    string[,] cellColors;
+
+    // string GetCellColor(int guessNo, int letterNo)
+    // {
+    //     var savedColor = cellColors[guessNo][letterNo];
+    //     // if cell color is empty (true on startup) or guess with current guessNo is not empty, compute the needed cell color
+    //     // if (string.IsNullOrWhiteSpace(savedColor) || !string.IsNullOrWhiteSpace(guesses[guessNo]))
+    //     if (guessesMade == guessNo+1 || string.IsNullOrWhiteSpace(guesses[guessNo]))
+    //     {
+    //         cellColors[guessNo][letterNo] = ComputeCellColor(guessNo, letterNo);
+    //     }
+
+    //     // if (string.IsNullOrWhiteSpace(savedColor) || guessesMade == guessNo || !string.IsNullOrWhiteSpace(guesses[guessNo]))
+    //     // {
+    //     //     cellColors[guessNo][letterNo] = ComputeCellColor(guessNo, letterNo);
+    //     // }
+    //     return cellColors[guessNo][letterNo];
+    // }
+
+    // string ComputeCellColor(int guessNo, int letterNo)
+    // {
+
+    //     string guess = guesses[guessNo];
+
+
+    //     char guessLetter = guess[letterNo];
+
+    //     bool guessLetterAppears = word.Contains(guessLetter);
+
+
+    //     var currentLetterMatchIndexes = AllIndexOf(word, guessLetter.ToString());
+
+
+    //     // if letter doesn't appear, return wrong.
+    //     if (!guessLetterAppears || string.IsNullOrWhiteSpace(guess))
+    //     {
+    //         return "cell color-wrong";
+    //     }
+    //     else // current guess letter appears in the word.
+    //     {
+    //         // if current guess letter appears in the word at the current position return correct.
+    //         if (word[letterNo] == guessLetter)
+    //         {
+    //             Console.WriteLine($"guessLetter {guessLetter} appears in the correct position.");
+    //             return "cell color-correct";
+    //         }
+
+    //         // if guessletter appears once in guess, and we are not there, return close.
+
+
+    //         // if char appears multiple times in guess
+    //         var guessLetterAppearancesInGuess = AllIndexOf(guess, guessLetter.ToString());
+    //         var guessLetterAppearancesInWord = AllIndexOf(word, guessLetter.ToString());
+
+
+    //         // if guessletter appears once in guess,
+    //         if (guessLetterAppearancesInGuess.Count() == 1)
+    //         {
+    //             // if and we are not there, return close.
+    //             Console.Write($"guessLetter {guessLetter} appears once in guess, ");
+    //             if (guessLetterAppearancesInWord.First() != letterNo)
+    //             {
+
+    //                 Console.WriteLine($"but not here. returning close.");
+    //                 return "cell color-close";
+    //             }
+    //             else
+    //             {
+    //                 Console.WriteLine($"and it's here?");
+    //             }
+    //         }
+
+
+
+    //         var matches = guessLetterAppearancesInGuess.Intersect(guessLetterAppearancesInWord).ToList();
+    //         // if any of the appearances of guessletter appear at the correct spot, and the spot is not the current letter, and the letter appears only once in the word, return wrong.
+
+    //         if (matches.Any())
+    //         {
+    //             // at least one appearance of the current letter, appears in the same spot in the word.
+    //             Console.WriteLine($"at least one appearance of the  guessLetter {guessLetter}, appears in the same spot in the word.");
+    //             if (matches.Count() == 1) // the current guess letter appears in the word current position at least once. If we are not there currently, return wrong.
+    //             {
+    //                 Console.WriteLine($"Matches count == 1");
+
+    //                 if (matches.First() != letterNo)
+    //                 {
+    //                     if (guessLetterAppearancesInWord.Count() > 1)
+    //                     {
+    //                         return "cell color-close";
+    //                     }
+    //                     return "cell color-wrong";
+    //                 }
+    //                 else
+    //                 {
+    //                     // the guessletter appears in the current location in the word. Correct.
+    //                     Console.WriteLine($"the guessletter appears in the current location in the word. Correct.");
+    //                     return "cell color-correct";
+    //                 }
+    //                 Console.WriteLine($"-----------");
+    //             }
+    //             else
+    //             {
+    //                 // the guessletter appears more than once in the word.
+    //                 Console.WriteLine($"The guessLetter {guessLetter} appears more than once in the word.");
+
+    //                 return "cell color-pink";
+    //             }
+    //         }
+    //     }
+
+
+    //     var gla = AllIndexOf(word, guessLetter.ToString());
+    //     if (gla.Any())
+    //     {
+    //         if (!alreadyHintedLettersForGuess[guessNo].Contains(guessLetter))
+    //         {
+    //             alreadyHintedLettersForGuess[guessNo].Add(guessLetter);
+    //             return "cell color-close";
+    //         }
+    //     }
+    //     else
+    //     {
+    //     }
+
+    //     return "cell color-none";
+    // }
+
+    private void SetGuessColor(int guessNo)
     {
-        var savedColor = cellColors[guessNo][letterNo];
-        // if cell color is empty (true on startup) or guess with current guessNo is not empty, compute the needed cell color
-        // if (string.IsNullOrWhiteSpace(savedColor) || !string.IsNullOrWhiteSpace(guesses[guessNo]))
-        if (guessesMade == guessNo+1 || string.IsNullOrWhiteSpace(guesses[guessNo]))
-        {
-            cellColors[guessNo][letterNo] = ComputeCellColor(guessNo, letterNo);
-        }
-
-        // if (string.IsNullOrWhiteSpace(savedColor) || guessesMade == guessNo || !string.IsNullOrWhiteSpace(guesses[guessNo]))
-        // {
-        //     cellColors[guessNo][letterNo] = ComputeCellColor(guessNo, letterNo);
-        // }
-        return cellColors[guessNo][letterNo];
-    }
-
-    string ComputeCellColor(int guessNo, int letterNo)
-    {
-
         string guess = guesses[guessNo];
 
-
-        char guessLetter = guess[letterNo];
-
-        bool guessLetterAppears = word.Contains(guessLetter);
-
-
-        var currentLetterMatchIndexes = AllIndexOf(word, guessLetter.ToString());
-
-
-        // if letter doesn't appear, return wrong.
-        if (!guessLetterAppears || string.IsNullOrWhiteSpace(guess))
+        for (int j = 0; j < word.Length; j++)
         {
-            return "cell color-wrong";
-        }
-        else // current guess letter appears in the word.
-        {
-            // if current guess letter appears in the word at the current position return correct.
-            if(word[letterNo] == guessLetter)
+            char guessLetter = guess[j];
+
+            if (word[j] == guessLetter)
             {
-                Console.WriteLine($"guessLetter {guessLetter} appears in the correct position.");
-                return "cell color-correct";
+                cellColors[guessNo, j] = "cell color-correct";
+
+                continue;
             }
 
-            // if guessletter appears once in guess, and we are not there, return close.
+            var pos = AllIndexOf(word, guessLetter.ToString());
 
 
-            // if char appears multiple times in guess
-            var guessLetterAppearancesInGuess = AllIndexOf(guess, guessLetter.ToString());
-            var guessLetterAppearancesInWord = AllIndexOf(word, guessLetter.ToString());
 
-
-            // if guessletter appears once in guess,
-            if (guessLetterAppearancesInGuess.Count() == 1)
+            if(pos.Count() == 1 && guess[pos.First()] != word[pos.First()]) // letter is in there once, but not here, and it's not at the right spot, so set close color.
             {
-                // if and we are not there, return close.
-                Console.Write($"guessLetter {guessLetter} appears once in guess, ");
-                if (guessLetterAppearancesInWord.First() != letterNo)
+                if (!alreadyHintedLettersForGuess[guessNo].Contains(guessLetter)) // if this letter has already been hinted, don't hint again.
                 {
-
-                    Console.WriteLine($"but not here. returning close.");
-                    return "cell color-close";
-                }
-                else
-                {
-                    Console.WriteLine($"and it's here?");
+                    alreadyHintedLettersForGuess[guessNo].Add(guessLetter);
+                    cellColors[guessNo, j] = "cell color-close";
+                    continue;
                 }
             }
 
-
-
-            var matches = guessLetterAppearancesInGuess.Intersect(guessLetterAppearancesInWord).ToList();
-            // if any of the appearances of guessletter appear at the correct spot, and the spot is not the current letter, and the letter appears only once in the word, return wrong. 
-
-            if (matches.Any())
-            {
-                // at least one appearance of the current letter, appears in the same spot in the word. 
-                Console.WriteLine($"at least one appearance of the  guessLetter {guessLetter}, appears in the same spot in the word.");
-                if (matches.Count() == 1) // the current guess letter appears in the word current position at least once. If we are not there currently, return wrong.
-                {
-                    Console.WriteLine($"Matches count == 1");
-
-                    if (matches.First() != letterNo)
-                    {
-                        if (guessLetterAppearancesInWord.Count() > 1)
-                        {
-                            return "cell color-close";
-                        }
-                        return "cell color-wrong";
-                    }
-                    else
-                    {
-                        // the guessletter appears in the current location in the word. Correct.
-                        Console.WriteLine($"the guessletter appears in the current location in the word. Correct.");
-                        return "cell color-correct";
-                    }
-                    Console.WriteLine($"-----------");
-                }
-                else
-                {
-                    // the guessletter appears more than once in the word.
-                    Console.WriteLine($"The guessLetter {guessLetter} appears more than once in the word.");
-
-                    return "cell color-pink";
-                }
-            }
+            
+            
+            cellColors[guessNo, j] = "cell color-wrong";           
         }
 
-
-        var gla = AllIndexOf(word, guessLetter.ToString());
-        if (gla.Any())
-        {
-            if (!alreadyHintedLettersForGuess[guessNo].Contains(guessLetter))
-            {
-                alreadyHintedLettersForGuess[guessNo].Add(guessLetter);
-                return "cell color-close";
-            }
-        }
-        else
-        {
-        }
-
-        return "cell color-none";
     }
 
     private void putGuess(string g)
@@ -179,10 +218,15 @@
         int ind = guesses.IndexOf(emptyGuess);
         if (ind > -1)
         {
+
             guesses[ind] = inputWord;
             inputWord = string.Empty;
+
+            SetGuessColor(ind);
             guessesMade++;
+
         }
+
     }
 
     protected void KeyDown(KeyboardEventArgs e)
@@ -193,6 +237,7 @@
                 if (inputWord.Length == word.Length)
                 {
                     putGuess(inputWord);
+
                 }
                 else
                 {
@@ -234,16 +279,12 @@
 
     protected override Task OnInitializedAsync()
     {
-        for (int n = 0; n < maxGuessCount; n++)
+        cellColors = new string[6, 6];
+        for (int i = 0; i < 6; i++)
         {
-            cellColors.Add(new List<string>());
-        }
-
-        for (int m = 0; m < cellColors.Count; m++)
-        {
-             for (int k = 0; k < maxGuessCount; k++)
+            for (int j = 0; j < 6; j++)
             {
-                cellColors[m].Add("");
+                cellColors[i, j] = "cell color-wrong";
             }
         }
 
