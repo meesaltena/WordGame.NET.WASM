@@ -37,14 +37,39 @@
     [Parameter]
     public int maxGuessCount { get; set; } = 6;
     public string inputWord { get; set; } = string.Empty;
-    private string word = "APMLY";
+    private string word = "AMPLE";
     private string emptyGuess = "     ";
 
     List<string> guesses = new();
 
     string GetCellColor(int i, int j)
     {
-        return "cell color-wrong";
+        var c = GetChar(i, j);
+
+        if(c == word[j])
+        {
+            return "cell color-correct";
+        }
+        else if (word.Contains(c)) // This is wrong
+        {
+            return "cell color-close";
+        }
+        else
+        {
+            return "cell color-wrong";
+        }
+        // if ()
+        // return "cell color-wrong";
+    }
+
+    private void putGuess(string g)
+    {
+        int ind = guesses.IndexOf(emptyGuess);
+        if (ind > -1)
+        {
+            guesses[ind] = inputWord;
+            inputWord = string.Empty;
+        }
     }
 
     protected void KeyDown(KeyboardEventArgs e)
@@ -56,12 +81,7 @@
             case "Enter":
                 if(inputWord.Length == word.Length)
                 {
-                    int ind = guesses.IndexOf(emptyGuess);
-                    if(ind > -1)
-                    {
-                        guesses[ind] = inputWord;
-                        inputWord = string.Empty;
-                    }
+                    putGuess(inputWord);
                 } else
                 {
                     // show shake animation
@@ -104,7 +124,7 @@
     protected override Task OnInitializedAsync()
     {
         guesses = Enumerable.Range(0, maxGuessCount).Select(_ => emptyGuess).ToList();
-        inputWord = "ADIEU";
+        // inputWord = "ADIEU";
         return base.OnInitializedAsync();
     }
 }
