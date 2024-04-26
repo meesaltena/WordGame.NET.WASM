@@ -4,12 +4,12 @@
 <div id="wordle-container" @onkeydown="KeyDown" tabindex="0">
     <div id="wordle-board">
 
-        @for (int i = 0; i < maxGuessCount; i++)
+        @for (int guessNo = 0; guessNo < maxGuessCount; guessNo++)
         {
             <div class="row">
-                @for (int j = 0; j < word.Length; j++)
+                @for (int letterNo = 0; letterNo < word.Length; letterNo++)
                 {
-                    <div class="@GetCellColor(i,j)">@GetChar(i, j)</div>
+                    <div class="@GetCellColor(guessNo,letterNo)">@GetCharacter(guessNo, letterNo)</div>
                 }
             </div>
         }
@@ -42,22 +42,109 @@
 
     List<string> guesses = new();
 
-    string GetCellColor(int i, int j)
+    string GetCellColor(int guessNo, int letterNo)
     {
-        var c = GetChar(i, j);
+        string guess = guesses[guessNo];
 
-        if(c == word[j])
-        {
-            return "cell color-correct";
-        }
-        else if (word.Contains(c)) // This is wrong
-        {
-            return "cell color-close";
-        }
-        else
-        {
+
+        char currentLetter = guess[letterNo];
+
+        var currentLetterMatchIndexes = AllIndexOf(word, currentLetter.ToString());
+
+        var charCountInGuess = AllIndexOf(guess, currentLetter.ToString());
+
+        if (currentLetterMatchIndexes.Count == 0)
             return "cell color-wrong";
+
+
+        if (currentLetterMatchIndexes.Count != charCountInGuess.Count)
+        {
+            // if (word[m.First()] == c)
+            // if (word[m.First()] == gue)
+            if (currentLetter == word[letterNo])
+            {
+                return "cell color-correct";
+            } else
+            {
+                return "cell color-wrong";
+            }
+         
+            // if (word[m.First()] == c && m.Contains(c) && charCountInGuess.Contains(c))
+            // {
+            //     return "cell color-correct"; 
+            // }
+
+            
+            // if (m.Count == charCountInGuess.Count)
+            // {
+            //     if (word[m.First()] == c)
+            //     {
+            //         return "cell color-correct";
+            //     }
+            //     return "cell color-close";
+            // }
+            // else if (m.Count < charCountInGuess.Count)
+            // {
+            //     if (m.Contains(i))
+            //     {
+            //         return "cell color-correct";
+            //     }
+            //     else
+            //     {
+            //         return "cell color-wrong";
+            //     }
+            // }
+
         }
+
+
+        // if (m.Count == 1)
+        // {
+        //     if (word[m.First()] == c)
+        //     {
+        //         return "cell color-correct";
+        //     }
+        //     return "cell color-close";
+        // }
+
+        // if (m.Count > 1)
+        // {
+        //     if (m.Count == charCountInGuess.Count)
+        //     {
+        //         if (word[m.First()] == c)
+        //         {
+        //             return "cell color-correct";
+        //         }
+        //         return "cell color-close";
+        //     }
+        //     else if (m.Count < charCountInGuess.Count)
+        //     {
+        //         if (m.Contains(i))
+        //         {
+        //             return "cell color-correct";
+        //         }
+        //         else
+        //         {
+        //             return "cell color-wrong";
+        //         }
+        //     }
+
+        // }
+
+        return "cell color-wrong";
+
+        // if(c == word[j])
+        // {
+        //     return "cell color-correct";
+        // }
+        // else if (word.Contains(c)) // This is wrong
+        // {
+        //     return "cell color-close";
+        // }
+        // else
+        // {
+        //     return "cell color-wrong";
+        // }
         // if ()
         // return "cell color-wrong";
     }
@@ -79,10 +166,11 @@
         switch (e.Key)
         {
             case "Enter":
-                if(inputWord.Length == word.Length)
+                if (inputWord.Length == word.Length)
                 {
                     putGuess(inputWord);
-                } else
+                }
+                else
                 {
                     // show shake animation
                 }
@@ -116,9 +204,9 @@
     }
 
 
-    char GetChar(int i, int j)
+    char GetCharacter(int guessNo, int letterNo)
     {
-        return guesses[i][j];
+        return guesses[guessNo][letterNo];
     }
 
     protected override Task OnInitializedAsync()
