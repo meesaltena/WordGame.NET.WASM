@@ -10,8 +10,6 @@
                 <div class="row">
                     @for (int letterNo = 0; letterNo < word.Length; letterNo++)
                     {
-                        @* <div class="@GetCellColor(guessNo,letterNo)">@GetCharacter(guessNo, letterNo)</div> *@
-                        @* <div class="@cellColors[guessNo][letterNo]">@GetCharacter(guessNo, letterNo)</div> *@
                         <div class="@cellColors[guessNo,letterNo]">@GetCharacter(guessNo, letterNo)</div>
                     }
                 </div>
@@ -47,8 +45,6 @@
     bool boardReady = false;
     List<string> guesses = new();
     Dictionary<int, List<char>> alreadyHintedLettersForGuess = new();
-    // List<List<string>> cellColors = new();
-
     string[,] cellColors;
 
 
@@ -67,34 +63,43 @@
                 continue;
             }
 
-            var pos = AllIndexOf(word, guessLetter.ToString());
-
-            if(pos.Count > 0) // 
+            var posIndexes = AllIndexOf(word, guessLetter.ToString());
+            var guessPosIndexes = AllIndexOf(guess, guessLetter.ToString());
+            
+            if (posIndexes.Count > 0)
             {
-                // if (pos.Count() == 1 && guess[pos.First()] != word[pos.First()]) // letter is in there once, but not here, and it's not at the right spot, so set close color.
-
                 // if first occurence of the guessLetter in the word is NOT correct
-                if (guess[pos.First()] != word[pos.First()]) // letter is in there once, but not here, and it's not at the right spot, so set close color.
+                foreach(var pos in posIndexes)
                 {
-                    // if this letter has already been hinted as many times as it occurs in the word, don't hint again.
-                    if (alreadyHintedLettersForGuess[guessNo].Where(l => l == guessLetter).Count() != word.Count(c => c == guessLetter)) 
+                    if (guess[pos] != word[pos]) // letter is in there once, but not here, and it's not at the right spot, so set close color.
                     {
-                        alreadyHintedLettersForGuess[guessNo].Add(guessLetter);
-                        cellColors[guessNo, j] = "cell color-close";
-                        continue;
+                        // if this letter has already been hinted as many times as it occurs in the word, don't hint again.
+                        if (alreadyHintedLettersForGuess[guessNo].Where(l => l == guessLetter).Count() != word.Count(c => c == guessLetter))
+                        {
+                            alreadyHintedLettersForGuess[guessNo].Add(guessLetter);
+                            cellColors[guessNo, j] = "cell color-close";
+                            
+                        }
                     }
                 }
 
-
+                // foreach (var pos in guessPosIndexes.Where(d => !posIndexes.Contains(d)))
+                foreach (var pos in guessPosIndexes)
+                {
+                    if (guess[pos] != word[pos]) 
+                    {
+                        // if this letter has already been hinted as many times as it occurs in the word, don't hint again.
+                        if (alreadyHintedLettersForGuess[guessNo].Where(l => l == guessLetter).Count() != (posIndexes.Count + guessPosIndexes.Count))
+                        {
+                            alreadyHintedLettersForGuess[guessNo].Add(guessLetter);
+                            cellColors[guessNo, j] = "cell color-close";
+                        }
+                    }
+                }
+                continue;
             }
-
-      
-
-            
-            
             cellColors[guessNo, j] = "cell color-wrong";           
         }
-
     }
 
     private void putGuess(string g)
@@ -121,7 +126,6 @@
                 if (inputWord.Length == word.Length)
                 {
                     putGuess(inputWord);
-
                 }
                 else
                 {
