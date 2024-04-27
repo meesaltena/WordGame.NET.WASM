@@ -8,21 +8,23 @@
         {
             @for (int guessNo = 0; guessNo < guesses.Count(); guessNo++)
             {
-                <div class="row">
+                <div class="row guessrow">
                     @for (int letterNo = 0; letterNo < guesses[guessNo].letters.Count(); letterNo++)
                     {
-                        <div class="@guesses[guessNo].letters[letterNo].CssColor()">@guesses[guessNo].letters[letterNo]</div>
+                        <div class="@guesses[guessNo].letters[letterNo].CssColor() spin-anim">@guesses[guessNo].letters[letterNo]</div>
                     }
                 </div>
             }
 
-            @* Empty laceholder rows *@
+            @* Empty placeholder rows *@
             @for (int p = 0; p < maxGuessCount-guesses.Count(); p++)
             {
                 <div class="row">
                     @for (int letterNo = 0; letterNo < word.Length; letterNo++)
                     {
-                        <div class="cell color-wrong"></div>
+                        <div>
+                            <div class="cell color-wrong"></div>
+                        </div>
                     }
                 </div>
             }
@@ -45,7 +47,29 @@
         </div>
     </div>
 </div>
+<style>
+    .spin-anim {
+        opacity: 0;
+        animation: spin forwards;
+    }
 
+    @@keyframes spin {
+        0% {
+            opacity:0;
+            transform: rotateY(180deg);
+        }
+        100% {
+            opacity:1;
+            transform: rotateY(0deg);
+        }
+    }
+
+    .guessrow div:nth-child(1) { animation-delay: 0.2s }
+    .guessrow div:nth-child(2) { animation-delay: 0.4s }
+    .guessrow div:nth-child(3) { animation-delay: 0.6s }
+    .guessrow div:nth-child(4) { animation-delay: 0.8s }
+    .guessrow div:nth-child(5) { animation-delay: 1s   }
+</style>
 @code {
     [Parameter]
     public int maxGuessCount { get; set; } = 6;
