@@ -4,31 +4,22 @@
 
 <div id="wordle-container" @onkeydown="KeyDown" tabindex="0">
     <div id="wordle-board">
-        @if (boardReady)
-        {
-            @for (int guessNo = 0; guessNo < guesses.Count(); guessNo++)
+            @for (int guessNo = 0; guessNo < maxGuessCount; guessNo++)
             {
                 <div class="row guessrow">
-                    @for (int letterNo = 0; letterNo < guesses[guessNo].letters.Count(); letterNo++)
-                    {
-                        <div class="@guesses[guessNo].letters[letterNo].CssColor() spin-anim">@guesses[guessNo].letters[letterNo]</div>
-                    }
-                </div>
-            }
-
-            @* Empty placeholder rows *@
-            @for (int p = 0; p < maxGuessCount-guesses.Count(); p++)
-            {
-                <div class="row">
                     @for (int letterNo = 0; letterNo < word.Length; letterNo++)
                     {
-                        <div>
+                        @if (guessNo < guesses.Count())
+                        {
+                            <div class="@guesses[guessNo].letters[letterNo].CssColor() spin-anim">@guesses[guessNo].letters[letterNo]</div>
+                        }
+                        else
+                        {
                             <div class="cell color-wrong"></div>
-                        </div>
+                        }
                     }
                 </div>
             }
-        }
     </div>
 
     <div id="wordle-input">
@@ -50,25 +41,40 @@
 <style>
     .spin-anim {
         opacity: 0;
-        animation: spin forwards;
+        animation: spin 0.5s forwards;
     }
 
     @@keyframes spin {
         0% {
-            opacity:0;
+            opacity: 0;
             transform: rotateY(180deg);
         }
+
         100% {
-            opacity:1;
+            opacity: 1;
             transform: rotateY(0deg);
         }
     }
 
-    .guessrow div:nth-child(1) { animation-delay: 0.2s }
-    .guessrow div:nth-child(2) { animation-delay: 0.4s }
-    .guessrow div:nth-child(3) { animation-delay: 0.6s }
-    .guessrow div:nth-child(4) { animation-delay: 0.8s }
-    .guessrow div:nth-child(5) { animation-delay: 1s   }
+    .guessrow div:nth-child(1) {
+        animation-delay: 0.0s
+    }
+
+    .guessrow div:nth-child(2) {
+        animation-delay: 0.2s
+    }
+
+    .guessrow div:nth-child(3) {
+        animation-delay: 0.4s
+    }
+
+    .guessrow div:nth-child(4) {
+        animation-delay: 0.6s
+    }
+
+    .guessrow div:nth-child(5) {
+        animation-delay: 0.8s
+    }
 </style>
 @code {
     [Parameter]
