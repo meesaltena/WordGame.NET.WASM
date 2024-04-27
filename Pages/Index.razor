@@ -4,20 +4,26 @@
 <div>
 <div id="header-text" class="">
     <div class="header-row">
-        <h1>Wordle.NET.WASM</h1>
+        <h1 @onclick="HeaderClicked">Wordle.NET.WASM</h1>
         <h3>build @BuildNumber</h3>
     </div>
 </div>
 
-<WordleBoard />
+    <WordleBoard @key="boardId" />
 
 </div>
 @code {
     string BuildNumber { get; set; } = string.Empty;
+    private Guid boardId = Guid.NewGuid();
 
     protected override Task OnInitializedAsync()
     {
         BuildNumber = typeof(Program).Assembly.GetName().Version!.ToString();
         return base.OnInitializedAsync();
+    }
+    private void HeaderClicked()
+    {
+        boardId = Guid.NewGuid();
+        Console.WriteLine("Clicked");
     }
 }

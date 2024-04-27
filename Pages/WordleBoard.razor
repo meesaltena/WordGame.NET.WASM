@@ -11,9 +11,9 @@
                     {
                         @if (guessNo < guesses.Count())
                         {
-                            <div class="@guesses[guessNo].letters[letterNo].CssColor() spin-anim" style="animation-delay:@((float)letterNo/5)s">
+                        <div class="@($"{guesses[guessNo].letters[letterNo].CssColor()} {(guesses[guessNo].IsCorrect() ? "win-anim" : "")} spin-anim ")" style="animation-delay:@((float)letterNo/5)s">
                                 @guesses[guessNo].letters[letterNo]
-                            </div>
+                        </div>
                         }
                         else
                         {
@@ -45,6 +45,37 @@
         opacity: 0;
         animation: spin 0.5s forwards;
     }
+    .win-anim {
+        opacity: 0;
+        animation-delay: 2s;
+        animation: upanddown 0.5s forwards;
+    }
+
+    @@keyframes upanddown {
+        0% {
+            opacity: 1;
+            transform: translateY(30%);
+        }
+
+        25% {
+            transform: translateY(-30%);
+        }
+
+        50% {
+        
+            transform: translateY(-35%);
+        }
+
+        75% {
+            opacity: 1;
+            transform: translateY(15%);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0%);
+        }
+    }
 
     @@keyframes spin {
         0% {
@@ -65,8 +96,7 @@
     public string inputWord { get; set; } = string.Empty;
     private string word = "APPLE";
     private bool boardReady = false;
-
-
+    private bool won = false;
     List<Guess> guesses = new();
 
 
