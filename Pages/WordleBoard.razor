@@ -1,6 +1,6 @@
 ﻿@using System.Text.RegularExpressions;
-@using Microsoft.AspNetCore.Components.Forms
-@using Wordle.NET.WASM.Models
+@using Microsoft.AspNetCore.Components.Forms;
+@using Wordle.NET.Models;
 
 <div id="wordle-container" @onkeydown="KeyDown" tabindex="0">
     <div id="wordle-board">
@@ -16,8 +16,7 @@
                 </div>
             }
 
-
-            @* Placeholder rows *@
+            @* Empty laceholder rows *@
             @for (int p = 0; p < maxGuessCount-guesses.Count(); p++)
             {
                 <div class="row">
@@ -51,13 +50,8 @@
     [Parameter]
     public int maxGuessCount { get; set; } = 6;
     public string inputWord { get; set; } = string.Empty;
-    // private string word = "APPLE";
-    // private string word = "AMPLE";
-    // private string word = "STEAL";
-    private string word = "CREPE";
-    private string emptyGuess = "     ";
-    private int guessesMade = 0;
-    bool boardReady = false;
+    private string word = "APPLE";
+    private bool boardReady = false;
 
 
     List<Guess> guesses = new();
@@ -69,26 +63,9 @@
         {
             Guess g = new Guess(input, word);
             guesses.Add(g);
-            // guesses[ind] = inputWord;
-
-
             inputWord = string.Empty;
-            //  SetGuessColor(ind);
-            guessesMade++;
-
-            // ComputeColors(inputWord, word);
         }
-
-
     }
-
-
-    // private void ComputeColors(string input, string word)
-    // {
-
-
-    // }
-
 
 
     protected void KeyDown(KeyboardEventArgs e)
@@ -121,40 +98,8 @@
         }
     }
 
-    public IList<int> AllIndexOf(string text, string str, StringComparison comparisonType = StringComparison.InvariantCultureIgnoreCase)
-    {
-        IList<int> allIndexOf = new List<int>();
-        int index = text.IndexOf(str, comparisonType);
-        while (index != -1)
-        {
-            allIndexOf.Add(index);
-            index = text.IndexOf(str, index + 1, comparisonType);
-        }
-        return allIndexOf;
-    }
-
-
-    // char GetCharacter(int guessNo, int letterNo)
-    // {
-    //     return guesses[guessNo][letterNo];
-    // }
-
     protected override Task OnInitializedAsync()
     {
-        // cellColors = new string[6, 6];
-        // for (int i = 0; i < 6; i++)
-        // {
-        //     for (int j = 0; j < 6; j++)
-        //     {
-        //         cellColors[i, j] = "cell color-wrong";
-        //     }
-        // }
-
-        // guesses = Enumerable.Range(0, maxGuessCount).Select(_ => emptyGuess).ToList();
-        // Enumerable.Range(0, maxGuessCount).ToList().ForEach(i =>
-        // {
-        //     alreadyHintedLettersForGuess.Add(i, new List<char>());
-        // });
         boardReady = true;
         return base.OnInitializedAsync();
     }

@@ -14,15 +14,11 @@
 }
 
 .row {
-    /* gap: 5px; */
-
-   /*margin: 5px 5px; */ 
     margin-bottom: 5px; 
     display: flex;
     column-gap: 5px;
     row-gap: 15px;
     justify-content: space-evenly;
-    /* margin-bottom: 1em; */
 }
 
 .cell {
