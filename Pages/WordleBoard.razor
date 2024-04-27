@@ -1,16 +1,29 @@
 ﻿@using System.Text.RegularExpressions;
 @using Microsoft.AspNetCore.Components.Forms
+@using Wordle.NET.WASM.Models
 
 <div id="wordle-container" @onkeydown="KeyDown" tabindex="0">
     <div id="wordle-board">
         @if (boardReady)
         {
-            @for (int guessNo = 0; guessNo < maxGuessCount; guessNo++)
+            @for (int guessNo = 0; guessNo < guesses.Count(); guessNo++)
+            {
+                <div class="row">
+                    @for (int letterNo = 0; letterNo < guesses[guessNo].letters.Count(); letterNo++)
+                    {
+                        <div class="@guesses[guessNo].letters[letterNo].CssColor()">@guesses[guessNo].letters[letterNo]</div>
+                    }
+                </div>
+            }
+
+
+            @* Placeholder rows *@
+            @for (int p = 0; p < maxGuessCount-guesses.Count(); p++)
             {
                 <div class="row">
                     @for (int letterNo = 0; letterNo < word.Length; letterNo++)
                     {
-                        <div class="@cellColors[guessNo,letterNo]">@GetCharacter(guessNo, letterNo)</div>
+                        <div class="cell color-wrong"></div>
                     }
                 </div>
             }
@@ -18,7 +31,6 @@
     </div>
 
     <div id="wordle-input">
-
         <div class="row">
             @for (int j = 0; j < inputWord.Length; j++)
             {
@@ -39,84 +51,45 @@
     [Parameter]
     public int maxGuessCount { get; set; } = 6;
     public string inputWord { get; set; } = string.Empty;
-    private string word = "APPLE";
+    // private string word = "APPLE";
+    // private string word = "AMPLE";
+    // private string word = "STEAL";
+    private string word = "CREPE";
     private string emptyGuess = "     ";
     private int guessesMade = 0;
     bool boardReady = false;
-    List<string> guesses = new();
-    Dictionary<int, List<char>> alreadyHintedLettersForGuess = new();
-    string[,] cellColors;
 
 
-    private void SetGuessColor(int guessNo)
+    List<Guess> guesses = new();
+
+
+    private void putGuess(string input)
     {
-        string guess = guesses[guessNo];
-
-        for (int j = 0; j < word.Length; j++)
+        if (guesses.Count() < maxGuessCount)
         {
-            char guessLetter = guess[j];
+            Guess g = new Guess(input, word);
+            guesses.Add(g);
+            // guesses[ind] = inputWord;
 
-            if (word[j] == guessLetter)
-            {
-                cellColors[guessNo, j] = "cell color-correct";
 
-                continue;
-            }
-
-            var posIndexes = AllIndexOf(word, guessLetter.ToString());
-            var guessPosIndexes = AllIndexOf(guess, guessLetter.ToString());
-            
-            if (posIndexes.Count > 0)
-            {
-                // if first occurence of the guessLetter in the word is NOT correct
-                foreach(var pos in posIndexes)
-                {
-                    if (guess[pos] != word[pos]) // letter is in there once, but not here, and it's not at the right spot, so set close color.
-                    {
-                        // if this letter has already been hinted as many times as it occurs in the word, don't hint again.
-                        if (alreadyHintedLettersForGuess[guessNo].Where(l => l == guessLetter).Count() != word.Count(c => c == guessLetter))
-                        {
-                            alreadyHintedLettersForGuess[guessNo].Add(guessLetter);
-                            cellColors[guessNo, j] = "cell color-close";
-                            
-                        }
-                    }
-                }
-
-                // foreach (var pos in guessPosIndexes.Where(d => !posIndexes.Contains(d)))
-                foreach (var pos in guessPosIndexes)
-                {
-                    if (guess[pos] != word[pos]) 
-                    {
-                        // if this letter has already been hinted as many times as it occurs in the word, don't hint again.
-                        if (alreadyHintedLettersForGuess[guessNo].Where(l => l == guessLetter).Count() != (posIndexes.Count + guessPosIndexes.Count))
-                        {
-                            alreadyHintedLettersForGuess[guessNo].Add(guessLetter);
-                            cellColors[guessNo, j] = "cell color-close";
-                        }
-                    }
-                }
-                continue;
-            }
-            cellColors[guessNo, j] = "cell color-wrong";           
-        }
-    }
-
-    private void putGuess(string g)
-    {
-        int ind = guesses.IndexOf(emptyGuess);
-        if (ind > -1)
-        {
-
-            guesses[ind] = inputWord;
             inputWord = string.Empty;
-
-            SetGuessColor(ind);
+            //  SetGuessColor(ind);
             guessesMade++;
 
+            // ComputeColors(inputWord, word);
         }
 
+
     }
+
+
+    // private void ComputeColors(string input, string word)
+    // {
+
+
+    // }
+
+
 
     protected void KeyDown(KeyboardEventArgs e)
     {
@@ -142,6 +115,7 @@
                 if (e.Key.Length == 1 && inputWord.Length < word.Length)
                 {
                     inputWord += e.Key.ToUpper();
+                    Console.WriteLine(inputWord);
                 }
                 break;
         }
@@ -160,27 +134,27 @@
     }
 
 
-    char GetCharacter(int guessNo, int letterNo)
-    {
-        return guesses[guessNo][letterNo];
-    }
+    // char GetCharacter(int guessNo, int letterNo)
+    // {
+    //     return guesses[guessNo][letterNo];
+    // }
 
     protected override Task OnInitializedAsync()
     {
-        cellColors = new string[6, 6];
-        for (int i = 0; i < 6; i++)
-        {
-            for (int j = 0; j < 6; j++)
-            {
-                cellColors[i, j] = "cell color-wrong";
-            }
-        }
+        // cellColors = new string[6, 6];
+        // for (int i = 0; i < 6; i++)
+        // {
+        //     for (int j = 0; j < 6; j++)
+        //     {
+        //         cellColors[i, j] = "cell color-wrong";
+        //     }
+        // }
 
-        guesses = Enumerable.Range(0, maxGuessCount).Select(_ => emptyGuess).ToList();
-        Enumerable.Range(0, maxGuessCount).ToList().ForEach(i =>
-        {
-            alreadyHintedLettersForGuess.Add(i, new List<char>());
-        });
+        // guesses = Enumerable.Range(0, maxGuessCount).Select(_ => emptyGuess).ToList();
+        // Enumerable.Range(0, maxGuessCount).ToList().ForEach(i =>
+        // {
+        //     alreadyHintedLettersForGuess.Add(i, new List<char>());
+        // });
         boardReady = true;
         return base.OnInitializedAsync();
     }
