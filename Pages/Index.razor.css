@@ -1,29 +1,13 @@
-﻿root {
-    --color-background: #121312;
-    --color-wrong: #3a3a3c;
-    --color-correct: #538d4e;
-    --color-close: #b59f3b;
-    --color-none: #ff6a00;
-    --color-pink: #ff00dc;
-}
-
-
+﻿
 
 #header-text {
-    /*    
-
-    margin-top: 2em;*/
-    /*flex-direction: column;*/
     display: flex;
-    /*align-items: center;*/
     justify-content: center;
     text-align: center;
 }
 
 .header-row {
     color: var(--color-grey);
-    /*display: flex;*/
-    /*justify-content: space-evenly;*/
 }
 
 .modal-close-button {
@@ -35,9 +19,9 @@
     font-family: Arial, Helvetica, sans-serif;
     font-size: 14px;
     font-weight: 600;
-    background: rgb(0, 149, 246);
     cursor: pointer;
-    color: #FFF;
+    background-color: var(--color-correct);
+    color: var(--color-white);
     transition: all 240ms linear;
 }
 
@@ -57,18 +41,23 @@ dialog {
     padding: 34px;
     border: 0;
     border-radius: 5px;
+    background-color: var(--color-white);
 }
 
+::backdrop {
+    background-image: linear-gradient( 45deg,var(--color-background), var(--color-correct), var(--color-grey));
+    opacity: 0.75;
+}
     dialog > p {
         text-align: center;
         margin: 0;
     }
 
-        dialog > p:first-of-type {
-            margin: 0 auto 20px;
-            font-size: 32px;
-            font-weight: 600;
-        }
+    dialog > p:first-of-type {
+        margin: 0 auto 20px;
+        font-size: 32px;
+        font-weight: 600;
+    }
 
     dialog > button {
         margin: 20px auto;

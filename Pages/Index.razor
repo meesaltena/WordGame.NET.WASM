@@ -2,6 +2,10 @@
 @using System.Reflection
 @using Wordle.NET.Models
 @inject IJSRuntime JS
+@implements IDisposable
+@inject NotifierService Notifier
+@inject TimerService Timer
+
 
 <div>
 <div id="header-text" class="">
@@ -55,9 +59,11 @@
     private Guid boardId = Guid.NewGuid();
     // private bool ShowGameWonModal { get; set; } = false;
     private Guess? WinningGuess { get; set; } = null;
+    private (string key, int value) lastNotification;
 
     protected override Task OnInitializedAsync()
     {
+        Notifier.Notify += OnNotify;
         BuildNumber = typeof(Program).Assembly.GetName().Version!.ToString();
         return base.OnInitializedAsync();
     }
@@ -67,6 +73,24 @@
         boardId = Guid.NewGuid();
         Console.WriteLine("Clicked");
     }
+
+
+    public async Task OnNotify(string key, int value)
+    {
+        await InvokeAsync(async () =>
+        {
+            await JS.InvokeVoidAsync("ShowGameWonModal");
+            lastNotification = (key, value);
+            StateHasChanged();
+        });
+        Timer.Stop();
+    }
+
+    private void StartTimer()
+    {
+        _ = Task.Run(() => Timer.Start(TimeSpan.FromSeconds(1.5)));
+    }
+
 
     private async Task CloseModal(bool reset)
     {
@@ -81,11 +105,11 @@
     {
         if (g.IsCorrect())
         {
-            Console.WriteLine("Correct!");
+            StartTimer();
             // if guess is correct, show animation
-            WinningGuess = g;
-            await JS.InvokeVoidAsync("ShowGameWonModal");
+            WinningGuess = g;           
         }
-
     }
+
+    public void Dispose() => Notifier.Notify -= OnNotify;
 }
