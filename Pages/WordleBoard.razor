@@ -92,6 +92,8 @@
 
 @code {
     [Parameter]
+    public EventCallback<Guess> OnGuessesCallback { get; set; }
+    [Parameter]
     public int maxGuessCount { get; set; } = 6;
     public string inputWord { get; set; } = string.Empty;
     private string word = "APPLE";
@@ -100,24 +102,26 @@
     List<Guess> guesses = new();
 
 
-    private void putGuess(string input)
+
+    private async Task putGuess(string input)
     {
         if (guesses.Count() < maxGuessCount)
         {
             Guess g = new Guess(input, word);
             guesses.Add(g);
             inputWord = string.Empty;
+            await OnGuessesCallback.InvokeAsync(g);
         }
     }
 
-    protected void KeyDown(KeyboardEventArgs e)
+    protected async Task KeyDown(KeyboardEventArgs e)
     {
         switch (e.Key)
         {
             case "Enter":
                 if (inputWord.Length == word.Length)
                 {
-                    putGuess(inputWord);
+                    await putGuess(inputWord);
                 }
                 else
                 {
