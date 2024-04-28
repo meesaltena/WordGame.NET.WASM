@@ -8,17 +8,13 @@
 
 
 <div>
-<div id="header-text" class="">
-    <div class="header-row">
-        <h1 @onclick="HeaderClicked">Wordle.NET.WASM</h1>
-        <h3>build @BuildNumber</h3>
+    <div id="header-text" class="">
+        <div class="header-row">
+            <h1 @onclick="HeaderClicked">Wordle.NET.WASM</h1>
+            <h3>build @BuildNumber</h3>
+        </div>
     </div>
-</div>
 
-    @if(WinningGuess != null)
-    {
-
-    }
 
     <dialog class="game-won-modal">
         <p>Congratulations!</p>
@@ -26,38 +22,26 @@
         <button @onclick="async () =>await  CloseModal(false)" class="modal-close-button">Nice, we'll take that</button>
         <button @onclick="async () => await CloseModal(true)" class="modal-close-button">Run it back</button>
     </dialog>
-    <WordleBoard showWonAnimation="showWonAnimation" @key="boardId" OnGuessesCallback="async (value) => await GuessedCallback(value)" />
+    <WordleBoard showWonAnimation="showWonAnimation" @key="boardId" OnGuessesCallback="(value) => GuessedCorrectCallback(value)" />
 
 </div>
 
 <script>
-    // const 
-    // const openButton = document.querySelector('.open-button');
-     
-
-    // openButton.addEventListener('click', () => {
-    //     modal.showModal();
-    // });
-    // const closeButton = document.querySelector('.modal-close-button');
-    // closeButton.addEventListener('click', () => {
-    //     modal.close();
-    // });
     window.HideGameWonModal = () => {
         var modal = document.querySelector('.game-won-modal');
         modal.close();
         console.log("hide");
     };
     window.ShowGameWonModal = () => {
-      var modal = document.querySelector('.game-won-modal');
-      modal.showModal();
-      console.log("show");
+        var modal = document.querySelector('.game-won-modal');
+        modal.showModal();
+        console.log("show");
     };
 </script>
 
 @code {
     string BuildNumber { get; set; } = string.Empty;
     private Guid boardId = Guid.NewGuid();
-    // private bool ShowGameWonModal { get; set; } = false;
     private Guess? WinningGuess { get; set; } = null;
     private (string key, int value) lastNotification;
     public bool showWonAnimation { get; set; } = false;
@@ -102,15 +86,14 @@
         await JS.InvokeVoidAsync("HideGameWonModal");
     }
 
-    private async Task GuessedCallback(Guess g)
+    private void GuessedCorrectCallback(Guess g)
     {
-        if (g.IsCorrect())
-        {
-            showWonAnimation = true;
-            StartTimer();
-            // if guess is correct, show animation
-            WinningGuess = g;           
-        }
+
+        showWonAnimation = true;
+        StartTimer();
+        // if guess is correct, show animation
+        WinningGuess = g;
+
     }
 
     public void Dispose() => Notifier.Notify -= OnNotify;

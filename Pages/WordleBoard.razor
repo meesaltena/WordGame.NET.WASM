@@ -6,12 +6,12 @@
     <div id="wordle-board">
             @for (int guessNo = 0; guessNo < maxGuessCount; guessNo++)
             {
-                <div class="row guessrow">
+            <div class="row guessrow @(guessClasses.ContainsKey(guessNo) ? guessClasses[guessNo] : "")" @ref="guessRefs[guessNo]">
                     @for (int letterNo = 0; letterNo < word.Length; letterNo++)
                     {
                         @if (guessNo < guesses.Count())
                         {
-                        <div class="@($"{guesses[guessNo].letters[letterNo].CssColor()} {(showWonAnimation ? "win-anim" : "")} spin-anim ")" style="animation-delay:@((float)letterNo/5)s">
+                        <div @ref="letterRefs[(guessNo,letterNo)]" class="@($"{guesses[guessNo].letters[letterNo].CssColor()} spin-anim ")" style="animation-delay:@((float)letterNo/5)s">
                                 @guesses[guessNo].letters[letterNo]
                         </div>
                         }
@@ -62,7 +62,6 @@
         }
 
         50% {
-        
             transform: translateY(-35%);
         }
 
@@ -101,8 +100,10 @@
     private string word = "APPLE";
     private bool boardReady = false;
     private bool won = false;
+    private Dictionary<(int, int), ElementReference> letterRefs = new Dictionary<(int, int), ElementReference>();
+    private Dictionary<int, ElementReference> guessRefs = new Dictionary<int, ElementReference>();
     List<Guess> guesses = new();
-
+    private Dictionary<int, string> guessClasses = new();
 
 
     private async Task putGuess(string input)
@@ -112,7 +113,15 @@
             Guess g = new Guess(input, word);
             guesses.Add(g);
             inputWord = string.Empty;
-            await OnGuessesCallback.InvokeAsync(g);
+            if (g.IsCorrect())
+            {
+                await Task.Delay(1500);
+                guessClasses[guesses.Count() - 1] = "win-anim";
+                await OnGuessesCallback.InvokeAsync(g);
+            }
+
+            // guessRefs[guesses.Count()].Cl
+            
         }
     }
 
@@ -149,6 +158,7 @@
 
     protected override Task OnInitializedAsync()
     {
+        guessClasses.Clear();
         boardReady = true;
         return base.OnInitializedAsync();
     }
