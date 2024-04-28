@@ -11,7 +11,7 @@
                     {
                         @if (guessNo < guesses.Count())
                         {
-                        <div class="@($"{guesses[guessNo].letters[letterNo].CssColor()} {(guesses[guessNo].IsCorrect() ? "win-anim" : "")} spin-anim ")" style="animation-delay:@((float)letterNo/5)s">
+                        <div class="@($"{guesses[guessNo].letters[letterNo].CssColor()} {(showWonAnimation ? "win-anim" : "")} spin-anim ")" style="animation-delay:@((float)letterNo/5)s">
                                 @guesses[guessNo].letters[letterNo]
                         </div>
                         }
@@ -95,6 +95,8 @@
     public EventCallback<Guess> OnGuessesCallback { get; set; }
     [Parameter]
     public int maxGuessCount { get; set; } = 6;
+    [Parameter]
+    public bool showWonAnimation { get; set; } = false;
     public string inputWord { get; set; } = string.Empty;
     private string word = "APPLE";
     private bool boardReady = false;

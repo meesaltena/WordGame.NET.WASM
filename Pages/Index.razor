@@ -26,7 +26,7 @@
         <button @onclick="async () =>await  CloseModal(false)" class="modal-close-button">Nice, we'll take that</button>
         <button @onclick="async () => await CloseModal(true)" class="modal-close-button">Run it back</button>
     </dialog>
-    <WordleBoard @key="boardId" OnGuessesCallback="async (value) => await GuessedCallback(value)" />
+    <WordleBoard showWonAnimation="showWonAnimation" @key="boardId" OnGuessesCallback="async (value) => await GuessedCallback(value)" />
 
 </div>
 
@@ -60,7 +60,7 @@
     // private bool ShowGameWonModal { get; set; } = false;
     private Guess? WinningGuess { get; set; } = null;
     private (string key, int value) lastNotification;
-
+    public bool showWonAnimation { get; set; } = false;
     protected override Task OnInitializedAsync()
     {
         Notifier.Notify += OnNotify;
@@ -97,6 +97,7 @@
         if (reset)
         {
             boardId = Guid.NewGuid();
+            showWonAnimation = false;
         }
         await JS.InvokeVoidAsync("HideGameWonModal");
     }
@@ -105,6 +106,7 @@
     {
         if (g.IsCorrect())
         {
+            showWonAnimation = true;
             StartTimer();
             // if guess is correct, show animation
             WinningGuess = g;           
