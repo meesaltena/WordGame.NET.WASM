@@ -6,13 +6,16 @@
     <div id="wordle-board">
             @for (int guessNo = 0; guessNo < maxGuessCount; guessNo++)
             {
-            <div class="row guessrow @(guessClasses.ContainsKey(guessNo) ? guessClasses[guessNo] : "")" @ref="guessRefs[guessNo]">
+            <div class="row guessrow" @ref="guessRefs[guessNo]">
                     @for (int letterNo = 0; letterNo < word.Length; letterNo++)
                     {
                         @if (guessNo < guesses.Count())
                         {
-                        <div @ref="letterRefs[(guessNo,letterNo)]" class="@($"{guesses[guessNo].letters[letterNo].CssColor()} spin-anim ")" style="animation-delay:@((float)letterNo/5)s">
+                        <div class="@($"{guesses[guessNo].letters[letterNo].CssColor()} {(letterClasses.ContainsKey((guessNo,letterNo)) ? letterClasses[(guessNo,letterNo)] : "spin-anim")}")"
+                             style="@($"{(letterClasses.ContainsKey((guessNo,letterNo)) ? "" : $"animation-delay:{(float)letterNo/5}" )}"   )">
                                 @guesses[guessNo].letters[letterNo]
+
+                            @* animation-delay:@((float)letterNo / 5)s *@
                         </div>
                         }
                         else
@@ -47,7 +50,7 @@
     }
     .win-anim {
         opacity: 0;
-        animation-delay: 2s;
+
         animation: upanddown 0.5s forwards;
     }
 
@@ -100,7 +103,7 @@
     private string word = "APPLE";
     private bool boardReady = false;
     private bool won = false;
-    private Dictionary<(int, int), ElementReference> letterRefs = new Dictionary<(int, int), ElementReference>();
+    private Dictionary<(int, int), string> letterClasses = new Dictionary<(int, int), string>();
     private Dictionary<int, ElementReference> guessRefs = new Dictionary<int, ElementReference>();
     List<Guess> guesses = new();
     private Dictionary<int, string> guessClasses = new();
@@ -116,7 +119,21 @@
             if (g.IsCorrect())
             {
                 await Task.Delay(1500);
-                guessClasses[guesses.Count() - 1] = "win-anim";
+
+
+                int guessNo = guesses.IndexOf(g);
+
+                foreach(Letter l in g.letters)
+                {
+                    int letterNo = g.letters.IndexOf(l);
+
+                    letterClasses[(guessNo, letterNo)] = "win-anim";
+                    StateHasChanged();
+                    // int delay = (g.letters.IndexOf(l)+1) * 200;
+                    // await Console.Out.WriteLineAsync($"{guessNo},{letterNo},delay: {delay}");
+                    await Task.Delay(300);
+                    letterClasses[(guessNo, letterNo)] = "";
+                }
                 await OnGuessesCallback.InvokeAsync(g);
             }
 
