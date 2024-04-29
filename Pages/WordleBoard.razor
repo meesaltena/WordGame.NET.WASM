@@ -46,12 +46,9 @@
         outline: none;
     }
     .spin-anim {
-        /* opacity: 1; */
         animation: spin 0.5s forwards;
     }
     .win-anim {
-        /* opacity: 1; */
-
         animation: upanddown 0.5s forwards;
     }
 
@@ -99,8 +96,6 @@
     public EventCallback<Guess> OnGuessesCallback { get; set; }
     [Parameter]
     public int maxGuessCount { get; set; } = 6;
-    [Parameter]
-    public bool showWonAnimation { get; set; } = false;
     public string inputWord { get; set; } = string.Empty;
     private string word = "APPLE";
     private bool boardReady = false;
@@ -119,38 +114,35 @@
             guesses.Add(g);
             inputWord = string.Empty;
 
+            //set letter color and reveal with spin animation
             for(int i = 0; i < g.letters.Count(); i++)
             {
-
                 await InvokeAsync(async () =>
                 {
                     g.SetLetterColor(i);
                     g.SetSpinAnimation(i);
-                    StateHasChanged(); // This is necessary to force the UI to update
-                    await Task.Delay(300);
-                });
-            
-                // await Task.Delay(300);
-                // awaitawait Task.Delay(300);
-                
-                
+                    StateHasChanged(); 
+                    await Task.Delay(200);
+                });   
             }
 
             if (g.IsCorrect())
             {
-
-                foreach(Letter l in g.letters)
+                for (int i = 0; i < g.letters.Count(); i++)
                 {
-                    l.animation = "win-anim";
-                    // await InvokeAsync(() => StateHasChanged());
-                    await Task.Delay(150);
-
+                    await InvokeAsync(async () =>
+                    {
+                        g.SetWinAnimation(i);
+                        StateHasChanged();
+                        await Task.Delay(100);
+                    });
                 }
 
-                await OnGuessesCallback.InvokeAsync(g);
+                await OnGuessesCallback.InvokeAsync(g); 
             }
-
-            
+        } else
+        {
+            await OnGuessesCallback.InvokeAsync();
         }
     }
 
@@ -161,7 +153,7 @@
             case "Enter":
                 if (inputWord.Length == word.Length)
                 {
-                    await putGuess(inputWord);
+                    await putGuess(inputWord.ToUpper());
                 }
                 else
                 {
