@@ -44,3 +44,7 @@
 .color-close {
     background-color: var(--color-close);
 }
+
+.wordle-container:focus {
+    outline: none;
+}

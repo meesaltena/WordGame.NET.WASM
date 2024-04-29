@@ -12,6 +12,7 @@
         <div class="header-row">
             <h1 @onclick="HeaderClicked">Wordle.NET.WASM</h1>
             <h3>build @BuildNumber</h3>
+            <h5>Mees Altena 2024</h5>
         </div>
     </div>
 
@@ -19,8 +20,8 @@
     <dialog class="game-won-modal">
         <p>Congratulations!</p>
         <p>You won! The word was @WinningGuess!</p>
-        <button @onclick="async () =>await  CloseModal(false)" class="modal-close-button">Nice, we'll take that</button>
-        <button @onclick="async () => await CloseModal(true)" class="modal-close-button">Run it back</button>
+        <button @onclick="async () =>await  CloseModal(false)" class="modal-close-button">Close</button>
+        <button @onclick="async () => await CloseModal(true)" class="modal-close-button">Go again</button>
     </dialog>
     <WordleBoard showWonAnimation="showWonAnimation" @key="boardId" OnGuessesCallback="(value) => GuessedCorrectCallback(value)" />
 

@@ -11,19 +11,17 @@
                     {
                         @if (guessNo < guesses.Count())
                         {
-                        <div class="@($"{guesses[guessNo].letters[letterNo].CssColor()} {(letterClasses.ContainsKey((guessNo,letterNo)) ? letterClasses[(guessNo,letterNo)] : "spin-anim")}")"
-                             style="@($"{(letterClasses.ContainsKey((guessNo,letterNo)) ? "" : $"animation-delay:{(float)letterNo/5}" )}"   )">
+                            <div class="@guesses[guessNo].letters[letterNo].cssClass" style="@guesses[guessNo].letters[letterNo].cssStyle">
                                 @guesses[guessNo].letters[letterNo]
+                            </div>
 
-                            @* animation-delay:@((float)letterNo / 5)s *@
-                        </div>
                         }
                         else
                         {
                             <div class="cell color-wrong"></div>
                         }
                     }
-                </div>
+            </div>
             }
     </div>
 
@@ -44,12 +42,15 @@
     </div>
 </div>
 <style>
+    *:focus {
+        outline: none;
+    }
     .spin-anim {
-        opacity: 0;
+        /* opacity: 1; */
         animation: spin 0.5s forwards;
     }
     .win-anim {
-        opacity: 0;
+        /* opacity: 1; */
 
         animation: upanddown 0.5s forwards;
     }
@@ -83,6 +84,7 @@
         0% {
             opacity: 0;
             transform: rotateY(180deg);
+
         }
 
         100% {
@@ -116,28 +118,38 @@
             Guess g = new Guess(input, word);
             guesses.Add(g);
             inputWord = string.Empty;
+
+            for(int i = 0; i < g.letters.Count(); i++)
+            {
+
+                await InvokeAsync(async () =>
+                {
+                    g.SetLetterColor(i);
+                    g.SetSpinAnimation(i);
+                    StateHasChanged(); // This is necessary to force the UI to update
+                    await Task.Delay(300);
+                });
+            
+                // await Task.Delay(300);
+                // awaitawait Task.Delay(300);
+                
+                
+            }
+
             if (g.IsCorrect())
             {
-                await Task.Delay(1500);
-
-
-                int guessNo = guesses.IndexOf(g);
 
                 foreach(Letter l in g.letters)
                 {
-                    int letterNo = g.letters.IndexOf(l);
+                    l.animation = "win-anim";
+                    // await InvokeAsync(() => StateHasChanged());
+                    await Task.Delay(150);
 
-                    letterClasses[(guessNo, letterNo)] = "win-anim";
-                    StateHasChanged();
-                    // int delay = (g.letters.IndexOf(l)+1) * 200;
-                    // await Console.Out.WriteLineAsync($"{guessNo},{letterNo},delay: {delay}");
-                    await Task.Delay(300);
-                    letterClasses[(guessNo, letterNo)] = "";
                 }
+
                 await OnGuessesCallback.InvokeAsync(g);
             }
 
-            // guessRefs[guesses.Count()].Cl
             
         }
     }
