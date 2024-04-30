@@ -1,12 +1,13 @@
 ﻿@using System.Text.RegularExpressions;
 @using Microsoft.AspNetCore.Components.Forms;
 @using Wordle.NET.Models;
+@using System.Reflection;
 
 <div id="wordle-container" @onkeydown="KeyDown" tabindex="0">
     <div id="wordle-board">
             @for (int guessNo = 0; guessNo < maxGuessCount; guessNo++)
             {
-            <div class="row guessrow" @ref="guessRefs[guessNo]">
+            <div class="row guessrow">
                     @for (int letterNo = 0; letterNo < word.Length; letterNo++)
                     {
                         @if (guessNo < guesses.Count())
@@ -29,7 +30,15 @@
         <div class="row">
             @for (int j = 0; j < inputWord.Length; j++)
             {
-                <div class="cell color-wrong">@inputWord[j]</div>
+                // show typed letter in red if it has already been wrongly guessed
+                @if(guesses.Any(g => g.letters.Where(l => l == inputWord[j] && l.color == Color.Wrong).Any()))
+                {
+                    <div class="cell color-warning">@inputWord[j]</div>
+                }
+                else
+                {
+                    <div class="cell color-wrong">@inputWord[j]</div>
+                }
             }
             @if (inputWord.Length < word.Length)
             {
@@ -97,14 +106,12 @@
     [Parameter]
     public int maxGuessCount { get; set; } = 6;
     public string inputWord { get; set; } = string.Empty;
-    private string word = "APPLE";
+    private string word { get; set; } = string.Empty;
     private bool boardReady = false;
     private bool won = false;
     private Dictionary<(int, int), string> letterClasses = new Dictionary<(int, int), string>();
-    private Dictionary<int, ElementReference> guessRefs = new Dictionary<int, ElementReference>();
     List<Guess> guesses = new();
-    private Dictionary<int, string> guessClasses = new();
-
+    private List<string> words { get; set; } = new();
 
     private async Task putGuess(string input)
     {
@@ -151,7 +158,7 @@
         switch (e.Key)
         {
             case "Enter":
-                if (inputWord.Length == word.Length)
+                if (inputWord.Length == word.Length && words.Contains(inputWord.ToLower()))
                 {
                     await putGuess(inputWord.ToUpper());
                 }
@@ -177,9 +184,40 @@
         }
     }
 
+    private void GetWordsFromAssembly()
+    {
+        try
+        {
+            const string wordsResource = "Wordle.NET.WASM.Words.FiveLetterWords.txt";
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            {
+                using Stream stream = assembly.GetManifestResourceStream(wordsResource)!;
+                if (stream is null)
+                {
+                    Console.WriteLine("Error: Missing \"FiveLetterWords.txt\" embedded resource.");
+                    Console.WriteLine("Press enter to continue...");
+                    return;
+                }
+                using StreamReader streamReader = new(stream);
+                while (!streamReader.EndOfStream)
+                {
+                    string line = streamReader.ReadLine()!;
+                    words.Add(line);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw;
+        }
+    }
+
     protected override Task OnInitializedAsync()
     {
-        guessClasses.Clear();
+        GetWordsFromAssembly();
+        word = words[Random.Shared.Next(words.Count)].ToUpperInvariant();
+        Console.WriteLine(word);
         boardReady = true;
         return base.OnInitializedAsync();
     }

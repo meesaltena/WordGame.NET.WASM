@@ -22,7 +22,7 @@
         <button @onclick="async () =>await  CloseModal(false)" class="modal-close-button">Close</button>
         <button @onclick="async () => await CloseModal(true)" class="modal-close-button">Go again</button>
     </dialog>
-    <WordleBoard  @key="boardId" OnGuessesCallback="(value) => GuessedCorrectCallback(value)" />
+    <WordleBoard @key="boardId" OnGuessesCallback="(value) => GuessedCorrectCallback(value)" />
 
 </div>
 
@@ -52,7 +52,7 @@
     private string ModalGradient { get; set; } = string.Empty;
     private string ModalHeader { get; set; } = string.Empty;
     private string ModalSubHeader { get; set; } = string.Empty;
-
+    
     protected override Task OnInitializedAsync()
     {
         Notifier.Notify += OnNotify;
@@ -65,7 +65,6 @@
         boardId = Guid.NewGuid();
         Console.WriteLine("Clicked");
     }
-
 
     public async Task OnNotify(string key, int value)
     {
@@ -82,7 +81,6 @@
     {
         _ = Task.Run(() => Timer.Start(TimeSpan.FromSeconds(1)));
     }
-
 
     private async Task CloseModal(bool reset)
     {
