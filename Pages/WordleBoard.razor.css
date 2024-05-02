@@ -51,3 +51,72 @@
 .wordle-container:focus {
     outline: none;
 }
+
+
+*:focus {
+    outline: none;
+}
+
+.spin-anim {
+    animation: spin 0.5s forwards;
+}
+
+.invalid-guess-anim {
+    animation: sidetoside 0.75s forwards;
+}
+
+.win-anim {
+    animation: upanddown 0.5s forwards;
+}
+
+@keyframes sidetoside {
+    10%, 90% {
+        transform: translateX(-5px)
+    }
+
+    20%, 80% {
+        transform: translateX(7px)
+    }
+
+    30%, 50%, 70% {
+        transform: translateX(-11px)
+    }
+
+    40%, 60% {
+        transform: translateX(11px)
+    }
+}
+
+@keyframes upanddown {
+    0% {
+        transform: translateY(30%);
+    }
+
+    25% {
+        transform: translateY(-30%);
+    }
+
+    50% {
+        transform: translateY(-35%);
+    }
+
+    75% {
+        transform: translateY(15%);
+    }
+
+    100% {
+        transform: translateY(0%);
+    }
+}
+
+@keyframes spin {
+    0% {
+        opacity: 0;
+        transform: rotateY(180deg);
+    }
+
+    100% {
+        opacity: 1;
+        transform: rotateY(0deg);
+    }
+}

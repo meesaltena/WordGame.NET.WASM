@@ -5,33 +5,32 @@
 
 <div id="wordle-container" @onkeydown="KeyDown" tabindex="0">
     <div id="wordle-board">
-            @for (int guessNo = 0; guessNo < maxGuessCount; guessNo++)
-            {
+        @for (int guessNo = 0; guessNo < maxGuessCount; guessNo++)
+        {
             <div class="row guessrow">
-                    @for (int letterNo = 0; letterNo < word.Length; letterNo++)
+                @for (int letterNo = 0; letterNo < word.Length; letterNo++)
+                {
+                    @if (guessNo < guesses.Count())
                     {
-                        @if (guessNo < guesses.Count())
-                        {
-                            <div class="@guesses[guessNo].letters[letterNo].cssClass" style="@guesses[guessNo].letters[letterNo].cssStyle">
-                                @guesses[guessNo].letters[letterNo]
-                            </div>
-
-                        }
-                        else
-                        {
-                            <div class="cell color-wrong"></div>
-                        }
+                        <div class="@guesses[guessNo].letters[letterNo].cssClass" style="@guesses[guessNo].letters[letterNo].cssStyle">
+                            @guesses[guessNo].letters[letterNo]
+                        </div>
                     }
+                    else
+                    {
+                        <div class="cell color-wrong"></div>
+                    }
+                }
             </div>
-            }
+        }
     </div>
 
-    <div id="wordle-input">
+    <div id="wordle-input" class="@inputRowClass">
         <div class="row">
             @for (int j = 0; j < inputWord.Length; j++)
             {
                 // show typed letter in red if it has already been wrongly guessed
-                @if(guesses.Any(g => g.letters.Where(l => l == inputWord[j] && l.color == Color.Wrong).Any()))
+                @if (guesses.Any(g => g.letters.Where(l => l == inputWord[j] && l.color == Color.Wrong).Any()))
                 {
                     <div class="cell color-warning">@inputWord[j]</div>
                 }
@@ -50,68 +49,19 @@
         </div>
     </div>
 </div>
-<style>
-    *:focus {
-        outline: none;
-    }
-    .spin-anim {
-        animation: spin 0.5s forwards;
-    }
-    .win-anim {
-        animation: upanddown 0.5s forwards;
-    }
-
-    @@keyframes upanddown {
-        0% {
-            opacity: 1;
-            transform: translateY(30%);
-        }
-
-        25% {
-            transform: translateY(-30%);
-        }
-
-        50% {
-            transform: translateY(-35%);
-        }
-
-        75% {
-            opacity: 1;
-            transform: translateY(15%);
-        }
-
-        100% {
-            opacity: 1;
-            transform: translateY(0%);
-        }
-    }
-
-    @@keyframes spin {
-        0% {
-            opacity: 0;
-            transform: rotateY(180deg);
-
-        }
-
-        100% {
-            opacity: 1;
-            transform: rotateY(0deg);
-        }
-    }
-</style>
 
 @code {
     [Parameter]
     public EventCallback<Guess> OnGuessesCallback { get; set; }
     [Parameter]
+    public EventCallback<string> OnInvalidGuessCallback { get; set; }
+    [Parameter]
     public int maxGuessCount { get; set; } = 6;
     public string inputWord { get; set; } = string.Empty;
     private string word { get; set; } = string.Empty;
-    private bool boardReady = false;
-    private bool won = false;
-    private Dictionary<(int, int), string> letterClasses = new Dictionary<(int, int), string>();
-    List<Guess> guesses = new();
+    private List<Guess> guesses = new();
     private List<string> words { get; set; } = new();
+    private string inputRowClass { get; set; } = string.Empty;
 
     private async Task putGuess(string input)
     {
@@ -122,15 +72,15 @@
             inputWord = string.Empty;
 
             //set letter color and reveal with spin animation
-            for(int i = 0; i < g.letters.Count(); i++)
+            for (int i = 0; i < g.letters.Count(); i++)
             {
                 await InvokeAsync(async () =>
                 {
                     g.SetLetterColor(i);
                     g.SetSpinAnimation(i);
-                    StateHasChanged(); 
+                    StateHasChanged();
                     await Task.Delay(200);
-                });   
+                });
             }
 
             if (g.IsCorrect())
@@ -144,10 +94,11 @@
                         await Task.Delay(100);
                     });
                 }
-
-                await OnGuessesCallback.InvokeAsync(g); 
+                await OnGuessesCallback.InvokeAsync(g);
             }
-        } else
+        }
+
+        if (guesses.Count() == maxGuessCount)
         {
             await OnGuessesCallback.InvokeAsync();
         }
@@ -158,30 +109,46 @@
         switch (e.Key)
         {
             case "Enter":
-                if (inputWord.Length == word.Length && words.Contains(inputWord.ToLower()))
+                if (inputWord.Length < word.Length)
                 {
-                    await putGuess(inputWord.ToUpper());
+                    await ShowInvalidGuessAnimationAndToast("Not enough letters.");
+                    return;
                 }
-                else
+                if (!words.Contains(inputWord.ToUpperInvariant()))
                 {
-                    // show shake animation
+                    await ShowInvalidGuessAnimationAndToast("Not in word list.");
+                    return;
                 }
-                break;
+
+                await putGuess(inputWord.ToUpperInvariant());
+                return;
+
             case "Backspace":
                 if (inputWord.Length > 0)
                 {
                     inputWord = inputWord.Remove(inputWord.Length - 1);
                 }
-                break;
+                return;
             default:
-                if (e.Key.Length == 1 && inputWord.Length < word.Length)
+                if (e.Key.Length == 1 && inputWord.Length < word.Length && Regex.IsMatch(e.Key, "^[a-zA-Z]"))
                 {
-                    //TODO allow only a-z
                     inputWord += e.Key.ToUpper();
-                    Console.WriteLine(inputWord);
                 }
                 break;
         }
+    }
+
+    private async Task ShowInvalidGuessAnimationAndToast(string message)
+    {
+        inputRowClass = "invalid-guess-anim";
+        await InvokeAsync(async () =>
+        {
+            await OnInvalidGuessCallback.InvokeAsync(message);
+            StateHasChanged();
+            await Task.Delay(1000);
+            inputRowClass = "";
+            StateHasChanged();
+        });
     }
 
     private void GetWordsFromAssembly()
@@ -195,14 +162,13 @@
                 if (stream is null)
                 {
                     Console.WriteLine("Error: Missing \"FiveLetterWords.txt\" embedded resource.");
-                    Console.WriteLine("Press enter to continue...");
                     return;
                 }
                 using StreamReader streamReader = new(stream);
                 while (!streamReader.EndOfStream)
                 {
                     string line = streamReader.ReadLine()!;
-                    words.Add(line);
+                    words.Add(line.ToUpperInvariant());
                 }
             }
         }
@@ -216,9 +182,8 @@
     protected override Task OnInitializedAsync()
     {
         GetWordsFromAssembly();
-        word = words[Random.Shared.Next(words.Count)].ToUpperInvariant();
+        word = words[Random.Shared.Next(words.Count)];
         Console.WriteLine(word);
-        boardReady = true;
         return base.OnInitializedAsync();
     }
 }

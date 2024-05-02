@@ -15,24 +15,25 @@
         </div>
     </div>
 
+  
+        <dialog class="game-won-modal">
+            <p>@ModalHeader</p>
+            <p>@ModalSubHeader</p>
+            <button @onclick="async () =>await  CloseModal(false)" class="modal-close-button">Close</button>
+            <button @onclick="async () => await CloseModal(true)" class="modal-close-button">Go again</button>
+        </dialog>
+    
 
-    <dialog class="game-won-modal">
-        <p>@ModalHeader</p>
-        <p>@ModalSubHeader</p>
-        <button @onclick="async () =>await  CloseModal(false)" class="modal-close-button">Close</button>
-        <button @onclick="async () => await CloseModal(true)" class="modal-close-button">Go again</button>
-    </dialog>
-    <WordleBoard @key="boardId" OnGuessesCallback="(value) => GuessedCorrectCallback(value)" />
+    <WordleBoard @key="boardId" OnInvalidGuessCallback="(value) => ShowInvalidGuessToast(value)" OnGuessesCallback="(value) => GuessedCorrectCallback(value)" />
+
+    @if (InvalidGuessToastVisible)
+    {
+        <div class="invalid-guess-toast">
+            <div class="invalid-guess-toast-body">@InvalidGuessToastMessage</div>
+        </div>
+    }
 
 </div>
-
-<style>
-    ::backdrop {
-        background-image: @ModalGradient;
-        opacity: 0.75;
-    }
-</style>
-
 <script>
     window.HideGameWonModal = () => {
         var modal = document.querySelector('.game-won-modal');
@@ -43,6 +44,12 @@
         modal.showModal();
     };
 </script>
+<style>
+    ::backdrop {
+        background-image: @ModalGradient;
+        opacity: 0.75;
+    }
+</style>
 
 @code {
     string BuildNumber { get; set; } = string.Empty;
@@ -52,7 +59,10 @@
     private string ModalGradient { get; set; } = string.Empty;
     private string ModalHeader { get; set; } = string.Empty;
     private string ModalSubHeader { get; set; } = string.Empty;
-    
+
+    private string InvalidGuessToastMessage { get; set; } = string.Empty;
+    private bool InvalidGuessToastVisible { get; set; } = false;
+
     protected override Task OnInitializedAsync()
     {
         Notifier.Notify += OnNotify;
@@ -77,9 +87,9 @@
         Timer.Stop();
     }
 
-    private void StartTimer()
+    private void StartTimer(int seconds)
     {
-        _ = Task.Run(() => Timer.Start(TimeSpan.FromSeconds(1)));
+        _ = Task.Run(() => Timer.Start(TimeSpan.FromSeconds(seconds)));
     }
 
     private async Task CloseModal(bool reset)
@@ -87,13 +97,30 @@
         if (reset)
         {
             boardId = Guid.NewGuid();
-        }
-        await JS.InvokeVoidAsync("HideGameWonModal");
+        }     
+        await InvokeAsync(async () =>
+        {
+            await JS.InvokeVoidAsync("HideGameWonModal");
+        });
+    }
+
+    private async Task ShowInvalidGuessToast(string message)
+    {
+        InvalidGuessToastMessage = message;
+        InvalidGuessToastVisible = true;
+
+        await InvokeAsync(async () =>
+        {
+            StateHasChanged();
+            await Task.Delay(1000);
+            InvalidGuessToastVisible = false;
+            StateHasChanged();
+        });
     }
 
     private void GuessedCorrectCallback(Guess? g)
     {
-        StartTimer();
+        StartTimer(1);
         if (g != null)
         {
             WinningGuess = g;
