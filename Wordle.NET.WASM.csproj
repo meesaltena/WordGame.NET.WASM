@@ -23,5 +23,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="Words\FiveLetterWords.txt" />
+		<EmbeddedResource Include="Words\answers.txt" />
 	</ItemGroup>
 </Project>

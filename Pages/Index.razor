@@ -1,10 +1,12 @@
 ﻿@page "/"
 @using System.Reflection
 @using Wordle.NET.Models
+@using Wordle.NET.WASM.Utility
 @inject IJSRuntime JS
 @implements IDisposable
 @inject NotifierService Notifier
 @inject TimerService Timer
+@inject FileUtils fileUtils
 
 <div>
     <div id="header-text" class="">
@@ -14,17 +16,16 @@
             <h5>Mees Altena 2024</h5>
         </div>
     </div>
-
   
-        <dialog class="game-won-modal">
-            <p>@ModalHeader</p>
-            <p>@ModalSubHeader</p>
-            <button @onclick="async () =>await  CloseModal(false)" class="modal-close-button">Close</button>
-            <button @onclick="async () => await CloseModal(true)" class="modal-close-button">Go again</button>
-        </dialog>
+    <dialog class="game-won-modal">
+        <p>@ModalHeader</p>
+        <p>@ModalSubHeader</p>
+        <button @onclick="async () =>await  CloseModal(false)" class="modal-close-button">Close</button>
+        <button @onclick="async () => await CloseModal(true)" class="modal-close-button">Go again</button>
+    </dialog>
     
-
-    <WordleBoard @key="boardId" OnInvalidGuessCallback="(value) => ShowInvalidGuessToast(value)" OnGuessesCallback="(value) => GuessedCorrectCallback(value)" />
+    
+    <WordleBoard allowedGuesses="@getAllowedGuesses()" word="@getRandomWord()" @key="boardId" OnInvalidGuessCallback="(value) => ShowInvalidGuessToast(value)" OnGuessesCallback="(value) => GuessedCorrectCallback(value)" />
 
     @if (InvalidGuessToastVisible)
     {
@@ -59,14 +60,22 @@
     private string ModalGradient { get; set; } = string.Empty;
     private string ModalHeader { get; set; } = string.Empty;
     private string ModalSubHeader { get; set; } = string.Empty;
-
     private string InvalidGuessToastMessage { get; set; } = string.Empty;
     private bool InvalidGuessToastVisible { get; set; } = false;
 
+    // https://gist.github.com/cfreshman/dec102adb5e60a8299857cbf78f6cf57
+    private List<string> getAllowedGuesses() => fileUtils.GetWordsFromAssembly("FiveLetterWords.txt");
+
+    private string getRandomWord() {
+        var possibleAnswers = fileUtils.GetWordsFromAssembly("answers.txt");
+        return possibleAnswers[Random.Shared.Next(possibleAnswers.Count())];
+    }
+   
     protected override Task OnInitializedAsync()
     {
         Notifier.Notify += OnNotify;
         BuildNumber = typeof(Program).Assembly.GetName().Version!.ToString();
+
         return base.OnInitializedAsync();
     }
 
@@ -128,7 +137,6 @@
             ModalGradient = "linear-gradient( 45deg,var(--color-background), var(--color-correct), var(--color-grey))";
             ModalHeader = "Congratulations!";
             ModalSubHeader = $"You won! The word was {@WinningGuess}!";
-
         } else
         {
             ModalGradient = "linear-gradient( 45deg,#B53CA2, var(--color-wrong), var(--color-grey))";

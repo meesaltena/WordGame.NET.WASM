@@ -10,10 +10,10 @@
             <div class="row guessrow">
                 @for (int letterNo = 0; letterNo < word.Length; letterNo++)
                 {
-                    @if (guessNo < guesses.Count())
+                    @if (guessNo < guessesMade.Count())
                     {
-                        <div class="@guesses[guessNo].letters[letterNo].cssClass" style="@guesses[guessNo].letters[letterNo].cssStyle">
-                            @guesses[guessNo].letters[letterNo]
+                        <div class="@guessesMade[guessNo].letters[letterNo].cssClass" style="@guessesMade[guessNo].letters[letterNo].cssStyle">
+                            @guessesMade[guessNo].letters[letterNo]
                         </div>
                     }
                     else
@@ -30,7 +30,7 @@
             @for (int j = 0; j < inputWord.Length; j++)
             {
                 // show typed letter in red if it has already been wrongly guessed
-                @if (guesses.Any(g => g.letters.Where(l => l == inputWord[j] && l.color == Color.Wrong).Any()))
+                @if (guessesMade.Any(g => g.letters.Where(l => l == inputWord[j] && l.color == Color.Wrong).Any()))
                 {
                     <div class="cell color-warning">@inputWord[j]</div>
                 }
@@ -56,19 +56,22 @@
     [Parameter]
     public EventCallback<string> OnInvalidGuessCallback { get; set; }
     [Parameter]
+    public List<string> allowedGuesses { get; set; } = new();
+    [Parameter]
+    public string word { get; set; } = string.Empty;
+
     public int maxGuessCount { get; set; } = 6;
     public string inputWord { get; set; } = string.Empty;
-    private string word { get; set; } = string.Empty;
-    private List<Guess> guesses = new();
-    private List<string> words { get; set; } = new();
+
+    private List<Guess> guessesMade = new();
     private string inputRowClass { get; set; } = string.Empty;
 
     private async Task putGuess(string input)
     {
-        if (guesses.Count() < maxGuessCount)
+        if (guessesMade.Count() < maxGuessCount)
         {
             Guess g = new Guess(input, word);
-            guesses.Add(g);
+            guessesMade.Add(g);
             inputWord = string.Empty;
 
             //set letter color and reveal with spin animation
@@ -98,7 +101,7 @@
             }
         }
 
-        if (guesses.Count() == maxGuessCount)
+        if (guessesMade.Count() == maxGuessCount)
         {
             await OnGuessesCallback.InvokeAsync();
         }
@@ -114,7 +117,7 @@
                     await ShowInvalidGuessAnimationAndToast("Not enough letters.");
                     return;
                 }
-                if (!words.Contains(inputWord.ToUpperInvariant()))
+                if (!allowedGuesses.Contains(inputWord.ToUpperInvariant()))
                 {
                     await ShowInvalidGuessAnimationAndToast("Not in word list.");
                     return;
@@ -151,38 +154,8 @@
         });
     }
 
-    private void GetWordsFromAssembly()
-    {
-        try
-        {
-            const string wordsResource = "Wordle.NET.WASM.Words.FiveLetterWords.txt";
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            {
-                using Stream stream = assembly.GetManifestResourceStream(wordsResource)!;
-                if (stream is null)
-                {
-                    Console.WriteLine("Error: Missing \"FiveLetterWords.txt\" embedded resource.");
-                    return;
-                }
-                using StreamReader streamReader = new(stream);
-                while (!streamReader.EndOfStream)
-                {
-                    string line = streamReader.ReadLine()!;
-                    words.Add(line.ToUpperInvariant());
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-            throw;
-        }
-    }
-
     protected override Task OnInitializedAsync()
     {
-        GetWordsFromAssembly();
-        word = words[Random.Shared.Next(words.Count)];
         Console.WriteLine(word);
         return base.OnInitializedAsync();
     }
