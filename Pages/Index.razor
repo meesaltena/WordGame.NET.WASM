@@ -63,8 +63,8 @@
     private string InvalidGuessToastMessage { get; set; } = string.Empty;
     private bool InvalidGuessToastVisible { get; set; } = false;
 
-    // https://gist.github.com/cfreshman/dec102adb5e60a8299857cbf78f6cf57
-    private List<string> getAllowedGuesses() => fileUtils.GetWordsFromAssembly("FiveLetterWords.txt");
+    // Word lists from https://gist.github.com/cfreshman/dec102adb5e60a8299857cbf78f6cf57
+    private List<string> getAllowedGuesses() => fileUtils.GetWordsFromAssembly("allowed.txt");
 
     private string getRandomWord() {
         var possibleAnswers = fileUtils.GetWordsFromAssembly("answers.txt");

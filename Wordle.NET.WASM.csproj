@@ -22,7 +22,6 @@
 		<ProjectReference Include="..\Wordle.NET.Models\Wordle.NET.Models.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<EmbeddedResource Include="Words\FiveLetterWords.txt" />
 		<EmbeddedResource Include="Words\answers.txt" />
 	</ItemGroup>
 </Project>
