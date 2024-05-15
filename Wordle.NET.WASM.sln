@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wordle.NET.Extensions", "Wordle.NET.Extensions\Wordle.NET.Extensions.csproj", "{40D12B31-3FAE-4396-A419-69173B70490F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wordle.NET.Models", "Wordle.NET.Models\Wordle.NET.Models.csproj", "{8FA3BC78-9D8A-4C85-A14E-99758DEB16A1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wordle.NET.WASM", "Wordle.NET.WASM\Wordle.NET.WASM.csproj", "{92288C83-E382-473C-BA41-EBED6E2878EE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{40D12B31-3FAE-4396-A419-69173B70490F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40D12B31-3FAE-4396-A419-69173B70490F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40D12B31-3FAE-4396-A419-69173B70490F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40D12B31-3FAE-4396-A419-69173B70490F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FA3BC78-9D8A-4C85-A14E-99758DEB16A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FA3BC78-9D8A-4C85-A14E-99758DEB16A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FA3BC78-9D8A-4C85-A14E-99758DEB16A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FA3BC78-9D8A-4C85-A14E-99758DEB16A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92288C83-E382-473C-BA41-EBED6E2878EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92288C83-E382-473C-BA41-EBED6E2878EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92288C83-E382-473C-BA41-EBED6E2878EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92288C83-E382-473C-BA41-EBED6E2878EE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7126703F-8A3C-48DA-84B3-1B1E2C90C98A}
+	EndGlobalSection
+EndGlobal
