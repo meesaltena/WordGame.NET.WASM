@@ -29,8 +29,9 @@
         <div class="row">
             @for (int j = 0; j < inputWord.Length; j++)
             {
-                // show typed letter in red if it has already been wrongly guessed
-                @if (guessesMade.Any(g => g.letters.Where(l => l == inputWord[j] && l.color == Color.Wrong).Any()))
+                // show typed letter in red if it has already been wrongly guessed before
+                @if (guessesMade.Any(g => g.letters.Where(l => l == inputWord[j] && l.color == Color.Wrong).Any() && 
+                                         !g.letters.Where(l => l == inputWord[j] && l.color == Color.Close).Any()))
                 {
                     <div class="cell color-warning">@inputWord[j]</div>
                 }

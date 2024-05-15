@@ -64,11 +64,17 @@
     private bool InvalidGuessToastVisible { get; set; } = false;
 
     // Word lists from https://gist.github.com/cfreshman/dec102adb5e60a8299857cbf78f6cf57
-    private List<string> getAllowedGuesses() => fileUtils.GetWordsFromAssembly("allowed.txt");
+    private List<string> getAllowedGuesses()
+    {
+        var allowedGuesses = fileUtils.GetWordsFromAssembly("allowed.txt");
+        var possibleAnswers = fileUtils.GetWordsFromAssembly("answers.txt");
+        allowedGuesses.AddRange(possibleAnswers);
+        return allowedGuesses;
+    }
 
     private string getRandomWord() {
         var possibleAnswers = fileUtils.GetWordsFromAssembly("answers.txt");
-        return possibleAnswers[Random.Shared.Next(possibleAnswers.Count())];
+         return possibleAnswers[Random.Shared.Next(possibleAnswers.Count())];
     }
    
     protected override Task OnInitializedAsync()
@@ -79,6 +85,7 @@
         return base.OnInitializedAsync();
     }
 
+    // reset word when header is clicked.
     private void HeaderClicked()
     {
         boardId = Guid.NewGuid();

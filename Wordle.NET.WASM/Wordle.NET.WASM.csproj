@@ -9,6 +9,7 @@
   <ItemGroup>
     <None Remove="Pages\Index.razor.css" />
     <None Remove="Pages\WordleBoard.razor.css" />
+    <None Remove="Words\allowed.txt" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Pages\Index.razor.css" />
@@ -22,6 +23,7 @@
 		<ProjectReference Include="..\Wordle.NET.Models\Wordle.NET.Models.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+		<EmbeddedResource Include="Words\allowed.txt" />
 		<EmbeddedResource Include="Words\answers.txt" />
 	</ItemGroup>
 </Project>
